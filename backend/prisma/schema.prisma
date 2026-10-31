@@ -1,0 +1,279 @@
+// YourCTF schema.
+// Portable by design: no Prisma enums, no provider-specific column types, so the
+// same models run on SQLite (dev) and PostgreSQL (prod) by switching `provider`
+// and DATABASE_URL. Roles / statuses / difficulties are string unions enforced
+// in application code (src/modules/*/schema.ts).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String    @id @default(cuid())
+  username        String    @unique
+  email           String    @unique
+  passwordHash    String
+  role            String    @default("USER") // USER | ADMIN
+  avatarUrl       String?
+  bio             String?
+  emailVerifiedAt DateTime?
+  // Bumped on password reset; stale JWTs are rejected by the auth middleware.
+  sessionVersion  Int       @default(0)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  teamId String?
+  team   Team?  @relation(fields: [teamId], references: [id], onDelete: SetNull)
+
+  ownedTeams  Team[]       @relation("TeamOwner")
+  submissions Submission[]
+  solves      Solve[]
+  hintUnlocks HintUnlock[]
+  authTokens  AuthToken[]
+}
+
+model Team {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  inviteCode  String   @unique
+  description String?
+  avatarUrl   String?
+  maxSize     Int      @default(5)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  ownerId String
+  owner   User   @relation("TeamOwner", fields: [ownerId], references: [id])
+
+  members     User[]
+  solves      Solve[]
+  submissions Submission[]
+  hintUnlocks HintUnlock[]
+}
+
+model Event {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  startsAt    DateTime?
+  endsAt      DateTime?
+  teamMaxSize Int       @default(5)
+  published   Boolean   @default(false)
+
+  // STATIC keeps each flag worth its configured points. DYNAMIC decays the
+  // award quadratically from the base value to scoringMinimumPoints across
+  // scoringDecayThreshold solves; the awarded amount is frozen on each Solve.
+  scoringMode           String @default("STATIC")
+  scoringMinimumPoints  Int    @default(100)
+  scoringDecayThreshold Int    @default(40)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  challenges Challenge[]
+}
+
+model Category {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  color     String?
+  icon      String?
+  createdAt DateTime @default(now())
+
+  challenges Challenge[]
+}
+
+model Challenge {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  difficulty  String   @default("medium") // easy | medium | hard | insane
+  points      Int // base points used by static scoring
+  published   Boolean  @default(false)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  eventId String?
+  event   Event?  @relation(fields: [eventId], references: [id], onDelete: SetNull)
+
+  flags       Flag[]
+  hints       Hint[]
+  files       ChallengeFile[]
+  solves      Solve[]
+  submissions Submission[]
+  hintUnlocks HintUnlock[]
+
+  @@index([categoryId])
+  @@index([eventId])
+}
+
+// One solvable flag per challenge task. Only salted hashes are stored.
+model Flag {
+  id        String   @id @default(cuid())
+  label     String? // e.g. "Task 1" for multi-flag challenges
+  salt      String
+  hash      String // <algo>(salt + ":" + normalized flag)
+  algo      String   @default("sha256") // sha256 | sha512
+  points    Int
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  challengeId String
+  challenge   Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+
+  solves      Solve[]
+  submissions Submission[]
+
+  @@index([challengeId])
+}
+
+model Hint {
+  id      String @id @default(cuid())
+  content String
+  cost    Int    @default(0)
+  order   Int    @default(0)
+
+  challengeId String
+  challenge   Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+
+  unlocks HintUnlock[]
+
+  @@index([challengeId])
+}
+
+// A paid hint redemption. `payerKey` is "team:<id>" for team members and
+// "user:<id>" for solo players, so a team is charged once per hint no matter
+// how many members open it. Scores are derived (solves − unlocks), never edited.
+model HintUnlock {
+  id          String   @id @default(cuid())
+  payerKey    String
+  pointsSpent Int
+  unlockedAt  DateTime @default(now())
+
+  hintId String
+  hint   Hint   @relation(fields: [hintId], references: [id], onDelete: Cascade)
+
+  challengeId String
+  challenge   Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  teamId String?
+  team   Team?   @relation(fields: [teamId], references: [id], onDelete: SetNull)
+
+  @@unique([hintId, payerKey])
+  @@index([userId])
+  @@index([teamId])
+  @@index([challengeId])
+}
+
+// Single-use, expiring email tokens. Only the SHA-256 hash is stored; the raw
+// token travels exclusively through the mail transport.
+model AuthToken {
+  id        String    @id @default(cuid())
+  type      String // verify | reset
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, type])
+}
+
+// A stored, downloadable handout. The random storedName is the only path
+// component used on disk, so client-supplied names can never traverse.
+model FileAsset {
+  id         String   @id @default(cuid())
+  name       String // original display name, sanitized
+  storedName String   @unique // random filename under UPLOAD_DIR
+  mimeType   String
+  sizeBytes  Int
+  createdAt  DateTime @default(now())
+
+  files ChallengeFile[]
+}
+
+model ChallengeFile {
+  id        String @id @default(cuid())
+  name      String
+  path      String? // external URL or legacy reference; null for stored assets
+  sizeBytes Int?
+  createdAt DateTime @default(now())
+
+  challengeId String
+  challenge   Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+
+  assetId String?
+  asset   FileAsset? @relation(fields: [assetId], references: [id], onDelete: SetNull)
+
+  @@index([challengeId])
+  @@index([assetId])
+}
+
+// Every flag attempt, correct or not. Wrong attempts are stored as a salted
+// hash plus length so a guessed flag value never lands in the database in
+// plaintext; correct attempts reference the matched flag id.
+model Submission {
+  id             String   @id @default(cuid())
+  providedSalt   String?
+  providedHash   String?
+  providedLength Int?
+  correct        Boolean
+  createdAt      DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  teamId String?
+  team   Team?   @relation(fields: [teamId], references: [id], onDelete: SetNull)
+
+  challengeId String
+  challenge   Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+
+  flagId String?
+  flag   Flag?   @relation(fields: [flagId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([teamId])
+  @@index([challengeId])
+}
+
+// A confirmed solve. Uniqueness blocks duplicate solves per user and per team.
+model Solve {
+  id         String   @id @default(cuid())
+  points     Int
+  firstBlood Boolean  @default(false)
+  solvedAt   DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  teamId String?
+  team   Team?   @relation(fields: [teamId], references: [id], onDelete: SetNull)
+
+  challengeId String
+  challenge   Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+
+  flagId String
+  flag   Flag   @relation(fields: [flagId], references: [id], onDelete: Cascade)
+
+  @@unique([flagId, userId])
+  @@unique([flagId, teamId])
+  @@index([teamId])
+  @@index([challengeId])
+}

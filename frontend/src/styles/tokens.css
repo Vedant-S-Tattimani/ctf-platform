@@ -1,0 +1,156 @@
+/* Design tokens — single source of truth (see docs/design-rules.md).
+   Dark world composed explicitly; OKLCH roles, not swatches. */
+
+:root {
+  color-scheme: dark;
+
+  /* ---- Color primitives (OKLCH) ---- */
+  --ink-950: oklch(0.16 0.02 265);
+  --ink-900: oklch(0.19 0.025 265);
+  --ink-850: oklch(0.22 0.03 265);
+  --ink-800: oklch(0.26 0.03 265);
+  --ink-700: oklch(0.32 0.035 265);
+  --ink-600: oklch(0.42 0.03 265);
+
+  --violet-300: oklch(0.84 0.1 292);
+  --violet-400: oklch(0.76 0.14 292);
+  --violet-500: oklch(0.7 0.18 292);
+  --violet-600: oklch(0.6 0.19 292);
+  --violet-700: oklch(0.5 0.17 292);
+
+  --cyan-300: oklch(0.88 0.09 195);
+  --cyan-400: oklch(0.8 0.15 195);
+  --cyan-500: oklch(0.72 0.14 195);
+
+  --green-400: oklch(0.78 0.16 155);
+  --amber-400: oklch(0.82 0.15 75);
+  --red-400: oklch(0.7 0.19 25);
+
+  --white: oklch(0.985 0 0);
+
+  /* ---- Semantic color roles ---- */
+  --bg-canvas: var(--ink-950);
+  --bg-surface: var(--ink-900);
+  --bg-elevated: var(--ink-850);
+  --bg-overlay: var(--ink-800);
+  --bg-glass: oklch(0.19 0.025 265 / 0.82);
+
+  --text-primary: oklch(0.93 0.01 265);
+  --text-secondary: oklch(0.78 0.02 265);
+  --text-muted: oklch(0.62 0.025 265);
+  --text-inverse: var(--ink-950);
+
+  --accent: var(--violet-500);
+  --accent-strong: var(--violet-400);
+  --accent-deep: var(--violet-600);
+  --accent-faint: oklch(0.7 0.18 292 / 0.12);
+  --on-accent: var(--white);
+
+  --secondary: var(--cyan-400);
+  --secondary-faint: oklch(0.8 0.15 195 / 0.12);
+  --on-secondary: var(--ink-950);
+
+  --success: var(--green-400);
+  --success-faint: oklch(0.78 0.16 155 / 0.12);
+  --warning: var(--amber-400);
+  --warning-faint: oklch(0.82 0.15 75 / 0.12);
+  --danger: var(--red-400);
+  --danger-faint: oklch(0.7 0.19 25 / 0.12);
+  --info: var(--secondary);
+
+  --border-hairline: oklch(0.93 0.01 265 / 0.08);
+  --border-subtle: oklch(0.93 0.01 265 / 0.14);
+  --border-strong: oklch(0.93 0.01 265 / 0.22);
+
+  --border-accent: oklch(0.7 0.18 292 / 0.45);
+  --border-info: oklch(0.8 0.15 195 / 0.4);
+  --border-success: oklch(0.78 0.16 155 / 0.4);
+  --border-warning: oklch(0.82 0.15 75 / 0.4);
+  --border-danger: oklch(0.7 0.19 25 / 0.45);
+
+  --bg-scrim: oklch(0.13 0.02 265 / 0.8);
+
+  --focus-ring: var(--violet-400);
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
+  --selection: oklch(0.7 0.18 292 / 0.35);
+  --caret: var(--violet-400);
+  --scrollbar-thumb: oklch(0.93 0.01 265 / 0.22);
+  --glow-accent: oklch(0.7 0.18 292 / 0.18);
+
+  /* ---- Typography ---- */
+  --font-display: 'Space Grotesk Variable', 'Inter', system-ui, sans-serif;
+  --font-body: 'Inter Variable', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, SFMono-Regular, 'Cascadia Mono', monospace;
+
+  /* Role scale: adjacent roles differ in size AND weight. */
+  --text-display: 3rem;      /* 48px hero */
+  --text-display--leading: 1.1;
+  --text-display--weight: 700;
+  --text-display--tracking: -0.03em;
+
+  --text-h1: 2.25rem;        /* 36px */
+  --text-h1--leading: 1.15;
+  --text-h1--weight: 700;
+  --text-h1--tracking: -0.025em;
+
+  --text-h2: 1.75rem;        /* 28px */
+  --text-h2--leading: 1.2;
+  --text-h2--weight: 600;
+  --text-h2--tracking: -0.02em;
+
+  --text-h3: 1.375rem;       /* 22px */
+  --text-h3--leading: 1.3;
+  --text-h3--weight: 600;
+  --text-h3--tracking: -0.015em;
+
+  --text-body: 1rem;         /* 16px floor */
+  --text-body--leading: 1.65; /* light-on-dark: +1 step */
+  --text-body--weight: 400;
+  --text-body--tracking: 0.005em;
+
+  --text-small: 0.875rem;    /* 14px, secondary UI only */
+  --text-small--leading: 1.5;
+  --text-small--weight: 400;
+
+  --text-label: 0.75rem;     /* 12px uppercase labels */
+  --text-label--leading: 1.2;
+  --text-label--weight: 600;
+  --text-label--tracking: 0.08em;
+
+  --text-mono: 0.9375rem;    /* 15px flags/code/numerals */
+  --text-mono--leading: 1.5;
+
+  /* ---- Space (4-unit base) ---- */
+  --space-1: 0.25rem;   /* 4 */
+  --space-2: 0.5rem;    /* 8 */
+  --space-3: 0.75rem;   /* 12 */
+  --space-4: 1rem;      /* 16 */
+  --space-6: 1.5rem;    /* 24 */
+  --space-8: 2rem;      /* 32 */
+  --space-12: 3rem;     /* 48 */
+  --space-16: 4rem;     /* 64 */
+  --space-24: 6rem;     /* 96 — section band */
+  --space-32: 8rem;     /* 128 — section band */
+
+  --container-max: 75rem; /* 1200px */
+  --measure: 70ch;        /* body copy target, 65–75ch */
+
+  /* ---- Radius roles ---- */
+  --radius-sm: 8px;   /* controls */
+  --radius-md: 12px;  /* cards, inputs */
+  --radius-lg: 16px;  /* panels, modals */
+  --radius-pill: 999px;
+
+  /* ---- Motion ---- */
+  --dur-instant: 120ms;   /* immediate feedback */
+  --dur-fast: 200ms;      /* routine state change */
+  --dur-base: 350ms;      /* overlays, view transitions */
+  --dur-slow: 650ms;      /* authored focal moment only */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+
+  /* ---- Elevation ---- */
+  --shadow-glow: 0 0 24px var(--glow-accent);
+  --shadow-panel: 0 16px 48px oklch(0.1 0.02 265 / 0.5);
+}

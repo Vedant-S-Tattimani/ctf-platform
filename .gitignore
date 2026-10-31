@@ -1,0 +1,36 @@
+node_modules/
+dist/
+build/
+coverage/
+*.log
+npm-debug.log*
+
+# env
+.env
+.env.local
+.env.*.local
+
+# sqlite (prisma dev database)
+*.db
+*.db-journal
+backend/prisma/dev.db
+backend/prisma/dev.db-journal
+
+# vite
+.vite/
+frontend/dist/
+
+# editors / os
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# test artifacts
+test-results/
+playwright-report/
+backend/test-uploads/
+
+# runtime handout uploads
+backend/uploads/

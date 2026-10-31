@@ -1,0 +1,135 @@
+@import './tokens.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-canvas text-primary font-body antialiased;
+    font-size: var(--text-body);
+    line-height: var(--text-body--leading);
+    letter-spacing: var(--text-body--tracking);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    caret-color: var(--caret);
+    scrollbar-color: var(--scrollbar-thumb) transparent;
+    scrollbar-width: thin;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border: 2px solid var(--bg-canvas);
+    border-radius: var(--radius-pill);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--border-strong);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display text-balance;
+  }
+
+  p {
+    @apply text-pretty;
+  }
+
+  ::selection {
+    background: var(--selection);
+    color: var(--white);
+  }
+
+  :focus-visible {
+    outline: var(--focus-ring-width) solid var(--focus-ring);
+    outline-offset: var(--focus-ring-offset);
+  }
+
+  input,
+  select,
+  textarea {
+    caret-color: var(--caret);
+  }
+}
+
+@layer components {
+  .type-display {
+    font-family: var(--font-display);
+    font-size: var(--text-display);
+    line-height: var(--text-display--leading);
+    font-weight: var(--text-display--weight);
+    letter-spacing: var(--text-display--tracking);
+  }
+  .type-h1 {
+    font-family: var(--font-display);
+    font-size: var(--text-h1);
+    line-height: var(--text-h1--leading);
+    font-weight: var(--text-h1--weight);
+    letter-spacing: var(--text-h1--tracking);
+  }
+  .type-h2 {
+    font-family: var(--font-display);
+    font-size: var(--text-h2);
+    line-height: var(--text-h2--leading);
+    font-weight: var(--text-h2--weight);
+    letter-spacing: var(--text-h2--tracking);
+  }
+  .type-h3 {
+    font-family: var(--font-display);
+    font-size: var(--text-h3);
+    line-height: var(--text-h3--leading);
+    font-weight: var(--text-h3--weight);
+    letter-spacing: var(--text-h3--tracking);
+  }
+  .type-small {
+    font-size: var(--text-small);
+    line-height: var(--text-small--leading);
+  }
+  .type-label {
+    font-size: var(--text-label);
+    line-height: var(--text-label--leading);
+    font-weight: var(--text-label--weight);
+    letter-spacing: var(--text-label--tracking);
+    text-transform: uppercase;
+  }
+  .type-mono {
+    font-family: var(--font-mono);
+    font-size: var(--text-mono);
+    line-height: var(--text-mono--leading);
+    font-variant-numeric: tabular-nums;
+  }
+  .nums {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Targeted reduction: spatial movement and decorative loops stop; state color and
+   opacity feedback stay. JS-driven motion is handled per component and by
+   MotionConfig reducedMotion="user" in App.tsx. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .animate-pulse {
+    animation: none !important;
+  }
+}

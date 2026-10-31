@@ -1,0 +1,31 @@
+# PostgreSQL for a production-shaped deployment.
+#
+#   docker compose up -d db
+#   # backend/.env
+#   DATABASE_URL="postgresql://yourctf:yourctf@localhost:5432/yourctf?schema=public"
+#   # backend/prisma/schema.prisma → datasource db { provider = "postgresql" }
+#   npx prisma migrate deploy && npm run seed
+#
+# The development and test database stays SQLite; this service is only needed
+# when you want to run against PostgreSQL. Change the password before exposing
+# the port outside your machine.
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: yourctf
+      POSTGRES_PASSWORD: yourctf
+      POSTGRES_DB: yourctf
+    ports:
+      - '5432:5432'
+    volumes:
+      - yourctf_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U yourctf -d yourctf']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  yourctf_pgdata:
