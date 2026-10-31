@@ -121,10 +121,9 @@ for (const path of targets) {
         }
 
         if (mode !== 'full') {
-          const steps = await page.evaluate(() =>
-            Math.min(12, Math.ceil(document.body.scrollHeight / window.innerHeight)),
-          );
-          for (let i = 0; i < steps; i += 1) {
+          // The landing mounts its below-fold sections on first scroll, so the
+          // step count is re-read at every position instead of once up front.
+          for (let i = 0; i < 14; i += 1) {
             await page.evaluate(
               (index) => window.scrollTo(0, index * window.innerHeight),
               i,
@@ -133,6 +132,10 @@ for (const path of targets) {
             const file = resolve(outDir, `${slug(path)}-${widthName}-${theme}-s${i + 1}.png`);
             await page.screenshot({ path: file });
             record.shots.push(`docs/shots/${iter}/${slug(path)}-${widthName}-${theme}-s${i + 1}.png`);
+            const done = await page.evaluate(
+              () => window.scrollY + window.innerHeight >= document.body.scrollHeight - 4,
+            );
+            if (done) break;
           }
         }
 

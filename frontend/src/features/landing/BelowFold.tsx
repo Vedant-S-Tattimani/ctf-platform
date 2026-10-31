@@ -1,16 +1,20 @@
+import { ChallengeRail } from './ChallengeRail';
 import { CtaBand } from './CtaBand';
 import { Disciplines } from './Disciplines';
-import { FeaturedChallenge } from './FeaturedChallenge';
+import { Faq } from './Faq';
 import { HowItWorks } from './HowItWorks';
 import { StatsBand } from './StatsBand';
+import { StickyFeature } from './StickyFeature';
 
 export default function BelowFold() {
   return (
     <>
       <Disciplines />
-      <FeaturedChallenge />
+      <ChallengeRail />
+      <StickyFeature />
       <StatsBand />
       <HowItWorks />
+      <Faq />
       <CtaBand />
     </>
   );

@@ -11,7 +11,7 @@ import { usePrefersCoarsePointer, usePrefersReducedMotion } from '@/hooks/usePre
 import { formatPoints } from '@/lib/format';
 import { ScoreSpine } from './ScoreSpine';
 
-const Aurora = lazy(() => import('@/components/reactbits/Aurora'));
+const ParticleField = lazy(() => import('@/components/reactbits/ParticleField'));
 
 export function Hero() {
   const { isAuthenticated } = useAuth();
@@ -35,24 +35,26 @@ export function Hero() {
         className="pointer-events-none absolute inset-0 -z-20"
         style={{
           background:
-            'radial-gradient(60% 55% at 18% 0%, oklch(0.7 0.18 292 / 0.16), transparent 70%), radial-gradient(50% 45% at 85% 8%, oklch(0.72 0.14 195 / 0.1), transparent 70%)',
+            'radial-gradient(55% 50% at 15% 0%, oklch(0.75 0.14 292 / 0.1), transparent 70%), radial-gradient(45% 40% at 88% 10%, oklch(0.8 0.1 200 / 0.09), transparent 70%)',
         }}
       />
-      {!reducedMotion && !coarsePointer && (
+      {reducedMotion || coarsePointer ? (
+        /* Static stand-in for the field: the same scatter, drawn with gradients
+           and frozen. No canvas, no animation frame, no motion. */
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 -z-10 opacity-[0.4]"
+          style={{
+            backgroundImage:
+              'radial-gradient(circle at center, oklch(0.62 0.19 258 / 0.5) 0 1.5px, transparent 2px), radial-gradient(circle at center, oklch(0.6 0.2 292 / 0.4) 0 1.5px, transparent 2px)',
+            backgroundSize: '168px 168px, 224px 224px',
+            backgroundPosition: '0 0, 84px 112px',
+          }}
+        />
+      ) : (
         <Suspense fallback={null}>
-          <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 opacity-50">
-            <Aurora
-              colorStops={['#7d68ff', '#2fb3c9', '#14182b']}
-              amplitude={1.2}
-              blend={0.5}
-              speed={0.5}
-              height={0.55}
-              layers={2}
-              glow={0.5}
-              opacity={0.42}
-              mouseInteraction={false}
-              dpr={1}
-            />
+          <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+            <ParticleField />
           </div>
         </Suspense>
       )}
@@ -61,7 +63,7 @@ export function Hero() {
         className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-40 bg-gradient-to-b from-transparent to-canvas"
       />
 
-      <div className="mx-auto grid max-w-container gap-12 px-4 pb-20 pt-14 sm:px-6 sm:pt-20 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-center lg:gap-16 lg:pb-24">
+      <div className="mx-auto grid min-h-[calc(100svh-4rem)] max-w-container content-center gap-12 px-4 pb-20 pt-14 sm:px-6 sm:pt-20 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-center lg:gap-16 lg:pb-24">
         <div className="flex flex-col items-start gap-6">
           <div className="flex min-h-8 items-center">
             {event.isPending ? (
@@ -71,8 +73,8 @@ export function Hero() {
             )}
           </div>
 
-          <h1 className="max-w-[17ch] text-[clamp(2.75rem,7vw,5rem)] font-medium leading-[1.02] tracking-[-0.035em] text-primary">
-            Every flag <span className="text-accent-strong">moves the board.</span>
+          <h1 className="max-w-[17ch] text-[clamp(2.75rem,7vw,5.5rem)] font-medium leading-[1.02] tracking-[-0.035em] text-primary">
+            Every flag moves the <span className="text-accent-strong">board.</span>
           </h1>
 
           <p className="max-w-measure text-lg leading-relaxed text-secondary">

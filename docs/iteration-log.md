@@ -111,3 +111,99 @@ on; the shell is re-judged at the Phase 7 whole-site pass.
 
 Checks: `npm run typecheck` clean, `npm run build` clean, `cd backend && npm test` 78/78,
 `git diff --stat backend/` empty.
+
+
+---
+
+## Phase 3 — landing showpiece
+
+Files touched (manifest, written as the phase started):
+`frontend/src/components/reactbits/ParticleField.tsx` (new),
+`components/ui/Reveal.tsx` (new), `components/ui/Carousel.tsx` (new),
+`features/landing/Hero.tsx`, `features/landing/BelowFold.tsx`,
+`features/landing/ChallengeRail.tsx` (new, replaces the deleted `FeaturedChallenge.tsx`),
+`features/landing/StickyFeature.tsx` (new), `features/landing/Faq.tsx` (new),
+`features/landing/CtaBand.tsx`, `features/landing/StatsBand.tsx`,
+`components/layout/RootLayout.tsx` (section-keyed `page-enter`), `styles/globals.css`
+(`.band-ink`, `.no-scrollbar`, `.stagger`, `sibling-index()` guard),
+`frontend/scripts/shoot.mjs` (dynamic stepped walk).
+
+### p3-01 — interrupted
+
+Not a usable capture. The first walk of `/` produced only three steps because the step count was
+computed before the deferred `BelowFold` mounted, so the rail, sticky panel, FAQ and CTA band were
+never on screen. Fixed the harness to re-read `document.body.scrollHeight` at every position; the
+attempted `docs/shots/p3-01/` directory is empty and left in place (Windows held a lock on it).
+
+### p3-02 — first full showpiece (`docs/shots/p3-02/`)
+
+Score 36/45. Mood 4 · Type 4 · Color 3 · Shape 5 · Hero 4 · Nav 4 · Motion 4 · Layout 4 · Polish 4.
+
+Six steps at 1440 and eight at 390, light theme, `0 page/theme combinations with failures, console
+errors or horizontal overflow`. The confetti field, the challenge rail bleeding off-edge with round
+controls, the sticky "submission returns" panel, the count-up stats band, the FAQ and the dark
+starfield CTA band with the full-bleed wordmark all render as intended.
+
+Three biggest gaps:
+1. **The hero headline put four of six words in violet.** The rubric wants accents as
+   glows/chips/tints, and the reference keeps display text in ink. → accent exactly one word.
+2. **The particle field was denser and heavier than the reference's sparse scatter**
+   (`density 105`, marks 4–11px, α 0.35–0.80, 1.75px strokes, cap 260). → fewer, thinner, fainter.
+3. **The carousel header was instructional noise** ("Drag, scroll or use the arrows"). → a mono
+   position readout that tracks the scroll, which is also the reference's numeric-chip rhythm.
+
+### p3-03 — accent restraint, sparse field, carousel readout (`docs/shots/p3-03/`)
+
+Applied the three gaps from p3-02: the hero headline keeps ink everywhere except the final word
+(`Every flag moves the <accent>board.</accent>`), the field dropped to 9 marks per 100k px² capped
+at 130 with 3–8px marks at α 0.26–0.60 and 1.5px strokes, and the carousel header's instruction
+line became a mono `01 / 06` position readout that tracks the scroll and dims the end it is at.
+Captured light **and** dark this time: 28 steps, `0 page/theme combinations with failures, console
+errors or horizontal overflow`.
+
+Two things only showed up once the field was thin: the footer wordmark stopped 17% short of the
+viewport edge at 1440 (`25vw` with a `20rem` cap), and the mobile sheet's links were rendering in
+`text-secondary` at display size, which is weaker than the reference's ink nav.
+
+### p3-04 / p3-05 — full-bleed wordmark, ink sheet links (`docs/shots/p3-04/`, `p3-05/`)
+
+The footer wordmark is now `clamp(3.5rem, 29vw, 40rem)` — 29vw is the measured ratio at which
+"YourCTF" spans the viewport at the −0.05em tracking, so it bleeds edge to edge at every width
+instead of only at the cap — with `leading-[0.85]` and a `0.04em` bottom pad so the glyphs are no
+longer cropped by the clip box. The sheet uses the same ratio at 24vw (its container is padded).
+Its links are `text-primary` with the arrow in the accent for the current section.
+`correct:false` / `duplicate:true` in the sticky panel moved into `nums` spans.
+
+### p3-06 — final landing capture (`docs/shots/p3-06/`)
+
+**Score 41/45. Mood 4 · Type 5 · Color 4 · Shape 5 · Hero 5 · Nav 5 · Motion 5 · Layout 4 · Polish 4.**
+
+Passes the gate: total ≥ 38, no criterion below 3, typecheck and build clean, and the report shows
+zero console errors and zero horizontal overflow at 1440 and 390 in both themes.
+
+Why not higher: **Color 4** — one screen still carries a violet radial tint, a violet headline word
+and violet standings numbers. **Layout 4** — 768 px was not re-shot this phase (Phase 8 covers it).
+**Polish 4** — the new landing primitives (mono readout, FAQ plus control) have not been contrast
+checked in both themes; that is Phase 8's AA sweep.
+
+### Phase 3 performance gate — measured, not certified
+
+`frontend/scripts/perf.mjs` (new) runs the Playwright chromium already in the dependency set against
+the preview build, cold cache, with Lighthouse's mobile emulation (4x CPU, slow-4G), and records
+FCP/LCP/TBT/CLS plus weight. Desktop is inside every good band (FCP 148ms, LCP 308ms, TBT 0ms,
+CLS 0.0047); mobile is not (FCP 1828ms, LCP 2412ms, TBT 346ms, CLS 0) because the landing is
+client-rendered: 161 KB gz of JS is on the wire before anything paints. The font-preload plugin in
+`vite.config.ts` fixed the swap shift; the remaining gap needs either a real Lighthouse run (a
+package outside the allowed list) or a prerendered hero shell. Both are written up in
+[ui-followups.md](ui-followups.md) rather than claimed as a pass.
+
+Checks: `npm run typecheck` clean, `npm run build` clean, `cd backend && npm test` 78/78,
+`git diff --stat backend/` empty.
+
+### Kit coverage
+
+`/__kit` gained a "Landing primitives" section showing the carousel, the staggered reveal and the
+particle field side by side. Shooting it at 390 caught a real bug the landing never showed: inside a
+grid column the carousel pushed the document 17px wide, because an `auto` grid column sizes to its
+item's min-content. Fixed with `min-w-0` on the carousel root and an explicit `grid-cols-1` on the
+kit row; `p3-kit2` re-shot light and dark with zero overflow and zero console errors.

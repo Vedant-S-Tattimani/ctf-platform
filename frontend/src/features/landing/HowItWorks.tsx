@@ -1,3 +1,5 @@
+import { Reveal } from '@/components/ui/Reveal';
+
 const STEPS = [
   {
     number: '01',
@@ -24,7 +26,7 @@ export function HowItWorks() {
       aria-labelledby="how-title"
     >
       <div className="grid gap-10 lg:grid-cols-[1fr_1.6fr] lg:gap-16">
-        <div className="flex flex-col gap-3">
+        <Reveal className="flex flex-col gap-3">
           <h2 id="how-title" className="type-h2 text-primary">
             How scoring works
           </h2>
@@ -35,9 +37,13 @@ export function HowItWorks() {
           <p className="max-w-measure type-small text-muted">
             The board re-ranks on the next refresh. Duplicate solves are refused, not re-scored.
           </p>
-        </div>
+        </Reveal>
 
-        <ol className="grid gap-8 sm:grid-cols-3 sm:gap-6">
+        <Reveal
+          as="ol"
+          stagger
+          className="stagger grid gap-8 sm:grid-cols-3 sm:gap-6"
+        >
           {STEPS.map((step) => (
             <li key={step.number} className="flex flex-col gap-2 border-t border-hairline pt-4">
               <span className="nums type-small text-accent-strong">{step.number}</span>
@@ -45,7 +51,7 @@ export function HowItWorks() {
               <p className="type-small text-secondary">{step.body}</p>
             </li>
           ))}
-        </ol>
+        </Reveal>
       </div>
     </section>
   );

@@ -122,6 +122,25 @@
   }
 }
 
+/* The dark full-bleed band. It inverts the role variables locally, so every
+   utility inside it (text-primary, bg-surface, border-hairline, the pill
+   variants) resolves against ink instead of paper — in either theme. */
+.band-ink {
+  --bg-canvas: transparent;
+  --bg-surface: oklch(0.27 0.018 265 / 0.65);
+  --bg-elevated: oklch(0.33 0.018 265 / 0.7);
+  --text-primary: var(--paper-25);
+  --text-secondary: oklch(0.92 0.008 265 / 0.86);
+  --text-muted: oklch(0.92 0.008 265 / 0.62);
+  --text-inverse: var(--ink-950);
+  --border-hairline: oklch(1 0 0 / 0.14);
+  --border-subtle: oklch(1 0 0 / 0.22);
+  --border-strong: oklch(1 0 0 / 0.42);
+  --accent-strong: oklch(0.78 0.15 292);
+  background-color: var(--ink-950);
+  color: var(--paper-25);
+}
+
 /* Scroll reveals. The class pair is driven by <Reveal> (IntersectionObserver);
    where the browser supports a view() timeline we let CSS do the work instead. */
 @layer utilities {
@@ -147,6 +166,25 @@
 
   .snap-item {
     scroll-snap-align: start;
+  }
+
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Staggered children. The container carries data-visible from <Reveal stagger>.
+     An animation, not a transition, so a child's own hover transition stays
+     intact; where sibling-index() exists the delay comes from position. */
+  .stagger > * {
+    opacity: 0;
+  }
+
+  .stagger[data-visible='true'] > * {
+    animation: stagger-in var(--dur-base) var(--ease-out) both;
   }
 
   /* Route change. Applied to the outlet wrapper, keyed per page group so an
@@ -196,6 +234,23 @@
   }
 }
 
+@supports (top: calc(sibling-index() * 1px)) {
+  .stagger[data-visible='true'] > * {
+    animation-delay: calc(sibling-index() * 45ms);
+  }
+}
+
+@keyframes stagger-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
     .reveal-css {
@@ -233,6 +288,11 @@
     opacity: 1;
     transform: none;
     transition: none;
+  }
+
+  .stagger > * {
+    opacity: 1;
+    animation: none;
   }
 
   .page-enter,

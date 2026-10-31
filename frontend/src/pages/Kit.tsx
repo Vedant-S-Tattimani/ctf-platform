@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { AnimatedList } from '@/components/reactbits/AnimatedList';
+import ParticleField from '@/components/reactbits/ParticleField';
 import { Stepper, type StepperStep } from '@/components/reactbits/Stepper';
 import { TiltedCard } from '@/components/reactbits/TiltedCard';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { Carousel } from '@/components/ui/Carousel';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { CopyButton } from '@/components/ui/CopyButton';
 import { DataTable, type DataTableColumn } from '@/components/ui/DataTable';
@@ -14,6 +16,7 @@ import { Input } from '@/components/ui/Input';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PasswordInput } from '@/components/ui/PasswordInput';
 import { Progress } from '@/components/ui/Progress';
+import { Reveal } from '@/components/ui/Reveal';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { Segmented } from '@/components/ui/Segmented';
 import { useTheme } from '@/store/theme';
@@ -388,6 +391,48 @@ export default function Kit() {
                 The stepper navigates sections; it does not gate saving. Every section is reachable
                 and owns its own validation.
               </p>
+            </div>
+          </div>
+        </section>
+
+        <section aria-labelledby="kit-landing" className="flex flex-col gap-4 border-t border-hairline pt-8">
+          <SectionHeader
+            id="kit-landing"
+            title="Landing primitives"
+            description="The pieces the landing composes: a scroll reveal, a snap carousel with round controls, and the hero's particle field."
+          />
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_20rem]">
+            <div className="flex flex-col gap-4">
+              <Carousel label="Kit carousel">
+                {['Snap on scroll, native touch', 'Round controls at both ends', 'A mono readout tracks position'].map(
+                  (line) => (
+                    <div
+                      key={line}
+                      className="flex h-40 flex-col justify-end rounded-lg border border-hairline bg-surface p-5 font-display text-h3 text-primary"
+                    >
+                      {line}
+                    </div>
+                  ),
+                )}
+              </Carousel>
+              <Reveal stagger className="grid gap-3 sm:grid-cols-3">
+                {['Transform only', 'Opacity only', 'One observer per element'].map((line) => (
+                  <div
+                    key={line}
+                    className="rounded-lg border border-hairline bg-elevated p-4 type-small text-secondary"
+                  >
+                    {line}
+                  </div>
+                ))}
+              </Reveal>
+              <p className="max-w-measure type-small text-muted">
+                Reveal watches its element with an IntersectionObserver and sets data-visible once.
+                The stagger variant defers each child by <code className="nums">sibling-index()</code>{' '}
+                where the browser supports it, and falls back to a single group fade where not.
+              </p>
+            </div>
+            <div className="h-64 overflow-hidden rounded-lg border border-hairline bg-surface">
+              <ParticleField density={22} speed={12} influence={90} />
             </div>
           </div>
         </section>

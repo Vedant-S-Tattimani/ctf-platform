@@ -1,0 +1,284 @@
+{
+  "base": "http://localhost:4173",
+  "runs": 3,
+  "good": {
+    "fcp": 1800,
+    "lcp": 2500,
+    "tbt": 200,
+    "cls": 0.1
+  },
+  "rows": [
+    {
+      "profile": "desktop",
+      "route": "/",
+      "ttfb": 6,
+      "fcp": 148,
+      "lcp": 308,
+      "cls": 0.0047,
+      "tbt": 0,
+      "dcl": 60,
+      "load": 60,
+      "dom": 469,
+      "requests": 15,
+      "transferred": 254893,
+      "band": {
+        "fcp": true,
+        "lcp": true,
+        "tbt": true,
+        "cls": true
+      },
+      "lcpNode": "h1.max-w-[17ch]",
+      "shifts": [
+        {
+          "at": 163,
+          "value": 0.025,
+          "nodes": [
+            "div.rounded-lg",
+            "div.flex"
+          ]
+        }
+      ],
+      "tasks": [],
+      "samples": [
+        {
+          "ttfb": 9,
+          "fcp": 156,
+          "lcp": 308,
+          "lcpNode": "p.type-small",
+          "cls": 0.0047,
+          "shifts": [
+            {
+              "at": 162,
+              "value": 0.0015,
+              "nodes": [
+                "div.flex"
+              ]
+            },
+            {
+              "at": 208,
+              "value": 0.0032,
+              "nodes": [
+                "div.flex"
+              ]
+            }
+          ],
+          "tbt": 0,
+          "tasks": [],
+          "dcl": 62,
+          "load": 62,
+          "dom": 469,
+          "requests": 15,
+          "transferred": 254893
+        },
+        {
+          "ttfb": 6,
+          "fcp": 148,
+          "lcp": 236,
+          "lcpNode": "h1.max-w-[17ch]",
+          "cls": 0.025,
+          "shifts": [
+            {
+              "at": 163,
+              "value": 0.025,
+              "nodes": [
+                "div.rounded-lg",
+                "div.flex"
+              ]
+            }
+          ],
+          "tbt": 0,
+          "tasks": [],
+          "dcl": 59,
+          "load": 60,
+          "dom": 469,
+          "requests": 15,
+          "transferred": 254893
+        },
+        {
+          "ttfb": 6,
+          "fcp": 148,
+          "lcp": 324,
+          "lcpNode": "p.type-small",
+          "cls": 0.0047,
+          "shifts": [
+            {
+              "at": 158,
+              "value": 0.0015,
+              "nodes": [
+                "div.flex"
+              ]
+            },
+            {
+              "at": 205,
+              "value": 0.0032,
+              "nodes": [
+                "div.flex"
+              ]
+            }
+          ],
+          "tbt": 0,
+          "tasks": [],
+          "dcl": 60,
+          "load": 60,
+          "dom": 469,
+          "requests": 15,
+          "transferred": 254893
+        }
+      ]
+    },
+    {
+      "profile": "mobile",
+      "route": "/",
+      "ttfb": 177,
+      "fcp": 1828,
+      "lcp": 2412,
+      "cls": 0,
+      "tbt": 346,
+      "dcl": 1479,
+      "load": 1479,
+      "dom": 469,
+      "requests": 15,
+      "transferred": 254893,
+      "band": {
+        "fcp": false,
+        "lcp": true,
+        "tbt": false,
+        "cls": true
+      },
+      "lcpNode": "p.max-w-measure",
+      "shifts": [],
+      "tasks": [
+        {
+          "at": 1351,
+          "duration": 131
+        },
+        {
+          "at": 1486,
+          "duration": 143
+        },
+        {
+          "at": 2063,
+          "duration": 77
+        },
+        {
+          "at": 2246,
+          "duration": 157
+        },
+        {
+          "at": 2455,
+          "duration": 88
+        }
+      ],
+      "samples": [
+        {
+          "ttfb": 177,
+          "fcp": 1788,
+          "lcp": 2412,
+          "lcpNode": "p.max-w-measure",
+          "cls": 0,
+          "shifts": [],
+          "tbt": 305,
+          "tasks": [
+            {
+              "at": 1342,
+              "duration": 120
+            },
+            {
+              "at": 1464,
+              "duration": 130
+            },
+            {
+              "at": 2030,
+              "duration": 71
+            },
+            {
+              "at": 2209,
+              "duration": 150
+            },
+            {
+              "at": 2417,
+              "duration": 84
+            }
+          ],
+          "dcl": 1461,
+          "load": 1461,
+          "dom": 469,
+          "requests": 15,
+          "transferred": 254893
+        },
+        {
+          "ttfb": 180,
+          "fcp": 1828,
+          "lcp": 2460,
+          "lcpNode": "p.max-w-measure",
+          "cls": 0,
+          "shifts": [],
+          "tbt": 346,
+          "tasks": [
+            {
+              "at": 1351,
+              "duration": 131
+            },
+            {
+              "at": 1486,
+              "duration": 143
+            },
+            {
+              "at": 2063,
+              "duration": 77
+            },
+            {
+              "at": 2246,
+              "duration": 157
+            },
+            {
+              "at": 2455,
+              "duration": 88
+            }
+          ],
+          "dcl": 1482,
+          "load": 1482,
+          "dom": 469,
+          "requests": 15,
+          "transferred": 254893
+        },
+        {
+          "ttfb": 173,
+          "fcp": 1864,
+          "lcp": 2356,
+          "lcpNode": "p.max-w-measure",
+          "cls": 0,
+          "shifts": [],
+          "tbt": 397,
+          "tasks": [
+            {
+              "at": 1335,
+              "duration": 144
+            },
+            {
+              "at": 1482,
+              "duration": 159
+            },
+            {
+              "at": 2120,
+              "duration": 82
+            },
+            {
+              "at": 2373,
+              "duration": 166
+            },
+            {
+              "at": 2734,
+              "duration": 96
+            }
+          ],
+          "dcl": 1479,
+          "load": 1479,
+          "dom": 469,
+          "requests": 15,
+          "transferred": 254893
+        }
+      ]
+    }
+  ]
+}

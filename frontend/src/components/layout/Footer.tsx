@@ -103,7 +103,7 @@ export function Footer() {
       {/* The reference's signature move: the wordmark at display size, edge to
           edge, in the same ink as the body copy. Clipped, never scrolled. */}
       <div aria-hidden className="overflow-hidden border-t border-hairline">
-        <p className="select-none whitespace-nowrap text-center font-display text-[clamp(4rem,25vw,20rem)] font-medium leading-[0.82] tracking-[-0.05em] text-primary">
+        <p className="select-none whitespace-nowrap pb-[0.04em] text-center font-display text-[clamp(3.5rem,29vw,40rem)] font-medium leading-[0.85] tracking-[-0.05em] text-primary">
           {BRAND.name}
         </p>
       </div>

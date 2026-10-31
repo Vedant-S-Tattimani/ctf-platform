@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { challengesApi } from '@/api/challenges';
+import { Reveal } from '@/components/ui/Reveal';
 import { Icon } from '@/lib/icons';
 import { cn } from '@/lib/utils';
 
@@ -42,7 +43,7 @@ export function Disciplines() {
       className="mx-auto max-w-container px-4 pt-20 sm:px-6 sm:pt-band"
       aria-labelledby="disciplines-title"
     >
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+      <Reveal className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <h2 id="disciplines-title" className="type-h2 text-primary">
           Disciplines
         </h2>
@@ -57,7 +58,7 @@ export function Disciplines() {
             className="transition-transform duration-fast ease-decel group-hover:translate-x-0.5 motion-reduce:transition-none"
           />
         </Link>
-      </div>
+      </Reveal>
 
       {isPending ? (
         <div className="grid gap-x-12 sm:grid-cols-2 lg:grid-cols-3" aria-hidden>
@@ -73,7 +74,7 @@ export function Disciplines() {
           No challenges are published yet. The board opens when the first event does.
         </p>
       ) : (
-        <div className="grid gap-x-12 sm:grid-cols-2 lg:grid-cols-3">
+        <Reveal stagger className="stagger grid gap-x-12 sm:grid-cols-2 lg:grid-cols-3">
           {categories.map((category) => (
             <Link
               key={category.id}
@@ -96,7 +97,7 @@ export function Disciplines() {
               </span>
             </Link>
           ))}
-        </div>
+        </Reveal>
       )}
     </section>
   );

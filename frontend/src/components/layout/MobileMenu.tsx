@@ -84,15 +84,18 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
           <NavLink
             key={link.to}
             to={link.to}
-            className={({ isActive }) =>
-              cn(
-                'flex items-center justify-between border-b border-hairline py-5 type-h2',
-                isActive ? 'text-primary' : 'text-secondary',
-              )
-            }
+            className="flex items-center justify-between border-b border-hairline py-5 type-h2 text-primary"
           >
-            {link.label}
-            <Icon name="arrow-right" size={18} className="text-muted" />
+            {({ isActive }) => (
+              <>
+                {link.label}
+                <Icon
+                  name="arrow-right"
+                  size={18}
+                  className={isActive ? 'text-accent-strong' : 'text-muted'}
+                />
+              </>
+            )}
           </NavLink>
         ))}
       </nav>
@@ -144,7 +147,7 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
           ]}
         />
         <div aria-hidden className="mt-8 overflow-hidden">
-          <p className="select-none whitespace-nowrap text-center font-display text-[clamp(3rem,22vw,9rem)] font-medium leading-[0.82] tracking-[-0.05em] text-primary">
+          <p className="select-none whitespace-nowrap pb-[0.04em] text-center font-display text-[clamp(3rem,24vw,20rem)] font-medium leading-[0.85] tracking-[-0.05em] text-primary">
             {BRAND.name}
           </p>
         </div>

@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { challengesApi } from '@/api/challenges';
 import { scoreboardApi } from '@/api/scoreboard';
 import CountUp from '@/components/reactbits/CountUp';
+import { Reveal } from '@/components/ui/Reveal';
 
 const STATS = [
   { key: 'challenges', label: 'Challenges' },
@@ -35,7 +36,11 @@ export function StatsBand() {
 
   return (
     <section aria-label="Board numbers" className="border-y border-hairline">
-      <dl className="mx-auto grid max-w-container grid-cols-2 px-4 py-10 sm:px-6 lg:grid-cols-4">
+      <Reveal
+        as="dl"
+        stagger
+        className="stagger mx-auto grid max-w-container grid-cols-2 px-4 py-10 sm:px-6 lg:grid-cols-4"
+      >
         {STATS.map((stat) => (
           <div
             key={stat.key}
@@ -51,7 +56,7 @@ export function StatsBand() {
             <dt className="type-small text-muted">{stat.label}</dt>
           </div>
         ))}
-      </dl>
+      </Reveal>
     </section>
   );
 }
