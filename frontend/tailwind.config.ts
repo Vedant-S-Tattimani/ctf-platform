@@ -101,6 +101,7 @@ export default {
       spacing: {
         band: 'var(--space-24)',
         'band-lg': 'var(--space-32)',
+        'band-xl': 'var(--space-48)',
       },
       maxWidth: {
         container: 'var(--container-max)',
@@ -110,6 +111,7 @@ export default {
         sm: 'var(--radius-sm)',
         md: 'var(--radius-md)',
         lg: 'var(--radius-lg)',
+        xl: 'var(--radius-xl)',
         pill: 'var(--radius-pill)',
       },
       transitionDuration: {
@@ -123,7 +125,9 @@ export default {
         accel: 'cubic-bezier(0.7, 0, 0.84, 0)',
       },
       boxShadow: {
-        glow: 'var(--shadow-glow)',
+        soft: 'var(--shadow-soft)',
+        card: 'var(--shadow-card)',
+        float: 'var(--shadow-float)',
         panel: 'var(--shadow-panel)',
       },
       screens: {

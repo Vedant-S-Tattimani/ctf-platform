@@ -87,8 +87,8 @@ export function Modal({ open, onClose, title, children, className }: ModalProps)
             aria-labelledby={titleId}
             tabIndex={-1}
             className={cn(
-              'relative w-full max-w-lg rounded-lg border border-subtle bg-surface p-6 shadow-panel outline-none',
-              'max-h-[85vh] overflow-y-auto',
+              'relative w-full max-w-lg rounded-lg border border-hairline bg-overlay p-6 shadow-float outline-none',
+              'max-h-[85vh] overflow-y-auto overscroll-contain',
               className,
             )}
             initial={{ opacity: 0, y: 16, scale: 0.98 }}

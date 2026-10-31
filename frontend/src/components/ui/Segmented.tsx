@@ -20,7 +20,7 @@ export function Segmented<T extends string>({
       role="group"
       aria-label={label}
       className={cn(
-        'inline-flex flex-wrap gap-1 rounded-sm border border-hairline bg-surface p-0.5',
+        'inline-flex flex-wrap gap-1 rounded-pill border border-hairline bg-surface p-1',
         className,
       )}
     >
@@ -33,8 +33,11 @@ export function Segmented<T extends string>({
             aria-pressed={active}
             onClick={() => onChange(option.value)}
             className={cn(
-              'min-h-10 rounded-sm px-3 text-small font-medium transition-colors duration-instant',
-              active ? 'bg-elevated text-primary' : 'text-secondary hover:text-primary',
+              'min-h-10 rounded-pill px-4 text-small font-medium',
+              'transition-[background-color,color,box-shadow] duration-instant ease-decel',
+              active
+                ? 'bg-canvas text-primary shadow-soft'
+                : 'text-secondary hover:text-primary',
             )}
           >
             {option.label}

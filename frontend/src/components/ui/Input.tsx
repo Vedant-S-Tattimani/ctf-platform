@@ -28,9 +28,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
           aria-invalid={error ? true : undefined}
           aria-describedby={describedBy}
           className={cn(
-            'h-11 w-full rounded-md border bg-elevated px-3 text-base text-primary',
-            'placeholder:text-muted transition-colors duration-instant',
-            'focus-visible:border-accent disabled:cursor-not-allowed disabled:opacity-60',
+            'h-11 w-full rounded-md border bg-overlay px-4 text-base text-primary shadow-soft',
+            'placeholder:text-muted transition-[border-color,box-shadow] duration-instant',
+            'focus-visible:border-accent focus-visible:shadow-card disabled:cursor-not-allowed disabled:opacity-60',
             error ? 'border-danger' : 'border-subtle hover:border-strong',
             trailing && 'pr-12',
             className,

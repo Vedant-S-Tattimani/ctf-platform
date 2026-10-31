@@ -71,7 +71,7 @@ export function Hero() {
             )}
           </div>
 
-          <h1 className="max-w-[17ch] text-[clamp(2.75rem,7vw,5rem)] font-bold leading-[1.02] tracking-[-0.04em] text-primary">
+          <h1 className="max-w-[17ch] text-[clamp(2.75rem,7vw,5rem)] font-medium leading-[1.02] tracking-[-0.035em] text-primary">
             Every flag <span className="text-accent-strong">moves the board.</span>
           </h1>
 

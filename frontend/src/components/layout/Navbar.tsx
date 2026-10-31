@@ -1,6 +1,7 @@
 import { Link, NavLink } from 'react-router-dom';
 import { EventStatus } from '@/components/events/EventStatus';
 import { UserMenu } from '@/components/layout/UserMenu';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { useCurrentEvent } from '@/features/events/queries';
 import { BRAND } from '@/lib/brand';
 import { Icon } from '@/lib/icons';
@@ -78,6 +79,7 @@ export function Navbar() {
         <div className="ml-auto flex items-center gap-1.5 sm:gap-2.5">
           <EventStatus event={data?.event} className="mr-0.5" />
           <PaletteTrigger />
+          <ThemeToggle />
           <UserMenu />
         </div>
       </div>

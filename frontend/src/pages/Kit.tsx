@@ -16,6 +16,7 @@ import { PasswordInput } from '@/components/ui/PasswordInput';
 import { Progress } from '@/components/ui/Progress';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { Segmented } from '@/components/ui/Segmented';
+import { useTheme } from '@/store/theme';
 import { Select } from '@/components/ui/Select';
 import { Stat, StatRow } from '@/components/ui/Stat';
 import { Tabs } from '@/components/ui/Tabs';
@@ -81,6 +82,8 @@ export default function Kit() {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [step, setStep] = useState('basics');
+  const mode = useTheme((state) => state.mode);
+  const setMode = useTheme((state) => state.setMode);
 
   return (
     <main className="mx-auto w-full max-w-container px-4 py-10 sm:px-6 sm:py-12">
@@ -95,6 +98,20 @@ export default function Kit() {
           </>
         }
       />
+
+      <div className="mb-10 flex flex-wrap items-center gap-3">
+        <span className="type-small text-secondary">Preview theme</span>
+        <Segmented
+          label="Preview theme"
+          value={mode}
+          onChange={setMode}
+          options={[
+            { value: 'light', label: 'Light' },
+            { value: 'dark', label: 'Dark' },
+            { value: 'system', label: 'System' },
+          ]}
+        />
+      </div>
 
       <div className="flex flex-col gap-16">
         <section aria-labelledby="kit-color" className="flex flex-col gap-6">

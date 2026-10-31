@@ -18,11 +18,13 @@ export type IconName =
   | 'info'
   | 'lock'
   | 'mail'
+  | 'moon'
   | 'pause'
   | 'play'
   | 'plus'
   | 'refresh'
   | 'search'
+  | 'sun'
   | 'user'
   | 'users'
   | 'warning';
@@ -105,6 +107,7 @@ const paths: Record<IconName, ReactNode> = {
       <path d="m3.5 7 8.5 6 8.5-6" />
     </>
   ),
+  moon: <path d="M20.5 14.8A8.6 8.6 0 1 1 9.2 3.5a7 7 0 0 0 11.3 11.3Z" />,
   pause: <path d="M9 5v14M15 5v14" />,
   play: <path d="M8.5 5.6v12.8L19 12 8.5 5.6Z" />,
   plus: <path d="M12 5v14M5 12h14" />,
@@ -118,6 +121,12 @@ const paths: Record<IconName, ReactNode> = {
     <>
       <circle cx="11" cy="11" r="7" />
       <path d="m20 20-3.5-3.5" />
+    </>
+  ),
+  sun: (
+    <>
+      <circle cx="12" cy="12" r="4" />
+      <path d="M12 3v2.2M12 18.8V21M3 12h2.2M18.8 12H21M5.6 5.6l1.6 1.6M16.8 16.8l1.6 1.6M18.4 5.6l-1.6 1.6M7.2 16.8l-1.6 1.6" />
     </>
   ),
   user: (

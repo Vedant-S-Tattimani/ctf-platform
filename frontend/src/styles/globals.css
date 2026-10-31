@@ -14,6 +14,7 @@
     @apply bg-canvas text-primary font-body antialiased;
     font-size: var(--text-body);
     line-height: var(--text-body--leading);
+    font-weight: var(--text-body--weight);
     letter-spacing: var(--text-body--tracking);
     padding-left: env(safe-area-inset-left);
     padding-right: env(safe-area-inset-right);
@@ -54,7 +55,7 @@
 
   ::selection {
     background: var(--selection);
-    color: var(--white);
+    color: var(--text-primary);
   }
 
   :focus-visible {
@@ -121,6 +122,55 @@
   }
 }
 
+/* Scroll reveals. The class pair is driven by <Reveal> (IntersectionObserver);
+   where the browser supports a view() timeline we let CSS do the work instead. */
+@layer utilities {
+  .reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition:
+      opacity var(--dur-base) var(--ease-out),
+      transform var(--dur-base) var(--ease-out);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+
+  .reveal-visible,
+  .reveal[data-visible='true'] {
+    opacity: 1;
+    transform: none;
+  }
+
+  .snap-x-mandatory {
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+  }
+
+  .snap-item {
+    scroll-snap-align: start;
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal-css {
+      animation: reveal-in linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 55%;
+    }
+  }
+}
+
+@keyframes reveal-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 /* Targeted reduction: spatial movement and decorative loops stop; state color and
    opacity feedback stay. JS-driven motion is handled per component and by
    MotionConfig reducedMotion="user" in App.tsx. */
@@ -131,5 +181,11 @@
 
   .animate-pulse {
     animation: none !important;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
 }

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Avatar } from '@/components/ui/Avatar';
+import { buttonVariants } from '@/components/ui/Button';
 import { useAuth } from '@/hooks/useAuth';
 import { Icon } from '@/lib/icons';
 import { cn } from '@/lib/utils';
@@ -72,13 +73,13 @@ export function UserMenu() {
       <div className="flex items-center gap-2">
         <Link
           to="/login"
-          className="inline-flex h-11 items-center whitespace-nowrap rounded-sm px-3 type-small font-semibold text-secondary transition-colors duration-instant hover:text-primary"
+          className={buttonVariants('ghost', 'sm', 'whitespace-nowrap')}
         >
           Sign in
         </Link>
         <Link
           to="/register"
-          className="hidden h-11 items-center whitespace-nowrap rounded-sm bg-accent px-4 type-small font-semibold text-inverse transition-colors duration-instant hover:bg-accent-strong lg:inline-flex"
+          className={buttonVariants('primary', 'sm', 'hidden whitespace-nowrap lg:inline-flex')}
         >
           Create account
         </Link>

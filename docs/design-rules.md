@@ -6,6 +6,33 @@ Every rule below is binding for the redesign and all future work. Where an older
 with a later, more specific rule (for example the Impeccable craft floor), the more specific rule
 wins. Source: design research, not taste.
 
+## Amendment 2026-11-01 — the world turns light
+
+The re-skin in [antigravity-redesign-plan.md](antigravity-redesign-plan.md) supersedes **World**,
+the surface half of **Color**, the **Shape** radii and the **Motion** hero rule. What follows is
+the current contract; every other section of this file still binds.
+
+- **World** — light and airy is the default; dark is a first-class `[data-theme="dark"]` override,
+  not an afterthought. Near-white canvas, ink text, generous section bands. Compose both worlds
+  explicitly; never ship a mechanically inverted theme.
+- **Color** — roles keep their names (`bg-canvas`, `text-primary`, `border-hairline`), values flip.
+  One accent is now too thin: violet stays the action colour, with blue, mint and coral allowed as
+  *sparse* tints for chips, icon fills and the hero particle field. Still no heavy flat colour
+  blocks, and still AA in both themes.
+- **Shape** — radii grow to 8 / 14 / 24 / 36 with pills for actions; elevation is diffuse and
+  low-alpha (`--shadow-soft` / `--shadow-card` / `--shadow-float`), replacing glow-on-dark.
+  Hairline borders stay 1px and stay the primary separator.
+- **Type** — one open geometric family (Outfit) plus a mono. Display sizes go up and weights come
+  *down*: 480 medium at hero scale with tight tracking, never 700. The 65–75ch measure, the 16px
+  body floor and the "adjacent roles differ in size and weight" rule are unchanged.
+- **Motion** — still one authored moment per page, still transform/opacity only, still reduced-motion
+  safe. That moment is now a cursor-reactive particle field on the landing hero instead of the
+  violet aurora. Scroll reveals, staggered children and hide-on-scroll chrome are added, not
+  scroll-jacking.
+- **Anti-goals** — all still binding, plus: do not copy Google's logo, product copy, imagery,
+  iconography or the proprietary Google Sans font. Matching a design *language* is the brief;
+  lifting assets is not.
+
 ## World
 
 Dark, premium, hacker-meets-editorial. Single accent (electric violet) used with restraint;
