@@ -2,6 +2,7 @@
  * Screenshot harness for the re-skin loop.
  *
  *   node scripts/shoot.mjs --iter=01 [--base=http://localhost:4173] [--only=/,/challenges]
+ *                          [--states=menu,palette]
  *
  * Saves shots at 1440x900 and 390x844, in light and dark, to ../docs/shots/<iter>/
  * and writes a console-error report next to them.
@@ -34,6 +35,22 @@ const widths = [
 ];
 const themes = arg('themes', 'light,dark').split(',');
 const mode = arg('mode', 'both');
+
+/**
+ * Interaction states, captured with the page at the top of the document. A state
+ * whose trigger is not present at this width (for example the mobile menu button
+ * at 1440) is skipped rather than failed.
+ */
+const stateActions = {
+  menu: (page) => page.getByRole('button', { name: 'Open menu' }).click({ timeout: 2500 }),
+  palette: async (page) => {
+    await page.keyboard.press('Control+k');
+    await page.waitForSelector('[role="dialog"]', { timeout: 2500 });
+  },
+};
+const states = arg('states', '')
+  .split(',')
+  .filter((name) => name in stateActions);
 
 const targets = arg(
   'only',
@@ -87,6 +104,21 @@ for (const path of targets) {
           () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
         );
         record.overflowX = overflowX;
+
+        for (const state of states) {
+          const file = resolve(outDir, `${slug(path)}-${widthName}-${theme}-${state}.png`);
+          const label = `docs/shots/${iter}/${slug(path)}-${widthName}-${theme}-${state}.png`;
+          try {
+            await stateActions[state](page);
+            await page.waitForTimeout(400);
+            await page.screenshot({ path: file });
+            record.shots.push(label);
+            await page.keyboard.press('Escape');
+            await page.waitForTimeout(250);
+          } catch {
+            record.skipped = [...(record.skipped ?? []), state];
+          }
+        }
 
         if (mode !== 'full') {
           const steps = await page.evaluate(() =>

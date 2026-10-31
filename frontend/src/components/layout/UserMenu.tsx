@@ -7,10 +7,10 @@ import { Icon } from '@/lib/icons';
 import { cn } from '@/lib/utils';
 
 const menuItem =
-  'flex w-full items-center rounded-sm px-3 py-2.5 text-left type-small text-secondary ' +
+  'flex w-full items-center rounded-md px-3 py-2.5 text-left type-small text-secondary ' +
   'transition-colors duration-instant hover:bg-elevated hover:text-primary';
 
-export function UserMenu() {
+export function UserMenu({ className }: { className?: string }) {
   const { user, status, isAdmin, logout } = useAuth();
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -65,12 +65,12 @@ export function UserMenu() {
   }, [open]);
 
   if (status === 'loading') {
-    return <span aria-hidden className="size-9 animate-pulse rounded-pill bg-elevated" />;
+    return <span aria-hidden className={cn('size-9 animate-pulse rounded-pill bg-elevated', className)} />;
   }
 
   if (!user) {
     return (
-      <div className="flex items-center gap-2">
+      <div className={cn('flex items-center gap-2', className)}>
         <Link
           to="/login"
           className={buttonVariants('ghost', 'sm', 'whitespace-nowrap')}
@@ -94,7 +94,7 @@ export function UserMenu() {
   }
 
   return (
-    <div ref={rootRef} className="relative">
+    <div ref={rootRef} className={cn('relative', className)}>
       <button
         ref={buttonRef}
         type="button"
@@ -103,7 +103,7 @@ export function UserMenu() {
         aria-expanded={open}
         aria-label={`Account menu for ${user.username}`}
         className={cn(
-          'flex h-11 items-center gap-2 rounded-sm pl-1 pr-1.5 transition-colors duration-instant',
+          'flex h-11 items-center gap-2 rounded-pill pl-1 pr-1.5 transition-colors duration-instant',
           'hover:bg-elevated',
           open && 'bg-elevated',
         )}
@@ -120,7 +120,7 @@ export function UserMenu() {
           ref={menuRef}
           role="menu"
           aria-label="Account"
-          className="absolute right-0 top-[calc(100%+0.375rem)] w-64 rounded-md border border-subtle bg-surface p-1.5 shadow-panel"
+          className="pop-in absolute right-0 top-[calc(100%+0.5rem)] w-64 rounded-lg border border-hairline bg-overlay p-1.5 shadow-float"
         >
           <div className="px-3 py-2">
             <p className="truncate type-small font-semibold text-primary">{user.username}</p>

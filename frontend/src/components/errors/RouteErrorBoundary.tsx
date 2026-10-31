@@ -24,16 +24,22 @@ export function RouteErrorBoundary() {
     : null;
 
   return (
-    <main className="mx-auto flex w-full max-w-container flex-col gap-6 px-4 py-20 sm:px-6">
-      <div className="flex flex-col gap-3">
-        <p className="type-h1 text-primary">This screen failed to render</p>
-        <p className="max-w-measure text-secondary">
-          Something broke while drawing this page{status ? ` (status ${status})` : ''}. Try again —
-          if it keeps failing, reload the app or head back home.
+    <main className="mx-auto flex w-full max-w-container flex-col gap-7 px-4 py-20 sm:px-6 lg:py-28">
+      <p className="type-mono text-small text-muted">
+        {status ? `${status} · ` : ''}render failed
+      </p>
+
+      <div className="flex flex-col gap-4">
+        <h1 className="max-w-[18ch] font-display text-display font-medium tracking-[-0.035em] text-primary">
+          This screen failed to render
+        </h1>
+        <p className="max-w-measure text-body text-secondary">
+          Something broke while drawing this page. Try again — if it keeps failing, reload the app
+          or head back home. Your submissions and score are untouched.
         </p>
       </div>
 
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="mt-1 flex flex-wrap items-center gap-3">
         <Button onClick={() => revalidator.revalidate()}>Try again</Button>
         <Button variant="secondary" onClick={() => window.location.reload()}>
           Reload
@@ -44,7 +50,7 @@ export function RouteErrorBoundary() {
       </div>
 
       {detail && (
-        <details className="rounded-md border border-hairline bg-surface p-4">
+        <details className="mt-6 rounded-md border border-hairline bg-elevated p-4">
           <summary className="cursor-pointer type-small font-semibold text-primary">
             Technical detail (development only)
           </summary>

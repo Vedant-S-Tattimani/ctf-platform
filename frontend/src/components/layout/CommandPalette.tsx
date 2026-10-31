@@ -238,7 +238,7 @@ export function CommandPalette() {
           role="dialog"
           aria-modal="true"
           aria-label="Command palette"
-          className="relative w-full max-w-xl overflow-hidden rounded-lg border border-subtle bg-surface shadow-panel"
+          className="relative w-full max-w-xl overflow-hidden rounded-lg border border-hairline bg-overlay shadow-float"
           initial={{ opacity: 0, y: -8, scale: 0.99 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -6 }}
@@ -275,7 +275,7 @@ export function CommandPalette() {
             id="palette-listbox"
             role="listbox"
             aria-label="Results"
-            className="max-h-[min(56vh,26rem)] overflow-y-auto p-2"
+            className="max-h-[min(56vh,26rem)] overflow-y-auto overscroll-contain p-2"
           >
             {matches.length === 0 ? (
               <p className="px-3 py-8 text-center type-small text-secondary">
@@ -298,7 +298,7 @@ export function CommandPalette() {
                         onMouseDown={(event) => event.preventDefault()}
                         onClick={() => run(action)}
                         className={cn(
-                          'flex cursor-pointer items-center justify-between gap-3 rounded-sm px-3 py-2.5',
+                          'flex cursor-pointer items-center justify-between gap-3 rounded-md px-3 py-2.5',
                           index === active
                             ? 'bg-elevated text-primary'
                             : 'text-secondary hover:bg-elevated/60',

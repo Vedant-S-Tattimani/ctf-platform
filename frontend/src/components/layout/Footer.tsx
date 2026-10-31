@@ -8,14 +8,14 @@ const columnHeading = 'type-label text-muted';
 const footerLink = 'type-small text-secondary transition-colors duration-instant hover:text-primary';
 
 export function Footer() {
-  const { isAdmin } = useAuth();
+  const { user, isAdmin } = useAuth();
   const { data } = useCurrentEvent();
   const event = data?.event ?? null;
 
   return (
     <footer className="border-t border-hairline bg-surface">
-      <div className="mx-auto flex max-w-container flex-col gap-10 px-4 py-12 sm:px-6 md:flex-row md:justify-between md:gap-16">
-        <div className="flex max-w-xs flex-col gap-3">
+      <div className="mx-auto grid max-w-container gap-12 px-4 py-14 sm:px-6 md:grid-cols-[minmax(0,1fr)_auto] md:gap-16 lg:py-20">
+        <div className="flex max-w-sm flex-col gap-4">
           <p className="font-display text-h3 text-primary">{BRAND.name}</p>
           <p className="type-small text-muted">{BRAND.tagline}</p>
           <div className="min-h-[1.5rem]">
@@ -27,7 +27,10 @@ export function Footer() {
           </div>
         </div>
 
-        <nav aria-label="Footer" className="grid grid-cols-2 gap-10 sm:grid-cols-3 md:gap-16">
+        <nav
+          aria-label="Footer"
+          className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-4 sm:gap-x-12"
+        >
           <div className="flex flex-col gap-3">
             <p className={columnHeading}>Play</p>
             <Link to="/challenges" className={footerLink}>
@@ -41,11 +44,46 @@ export function Footer() {
             </Link>
           </div>
 
+          <div className="flex flex-col gap-3">
+            <p className={columnHeading}>Account</p>
+            {user ? (
+              <>
+                <Link to="/account" className={footerLink}>
+                  My account
+                </Link>
+                <Link to={`/users/${user.id}`} className={footerLink}>
+                  Public profile
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link to="/login" className={footerLink}>
+                  Sign in
+                </Link>
+                <Link to="/register" className={footerLink}>
+                  Create account
+                </Link>
+              </>
+            )}
+            <Link to="/forgot-password" className={footerLink}>
+              Reset password
+            </Link>
+          </div>
+
           {isAdmin && (
             <div className="flex flex-col gap-3">
               <p className={columnHeading}>Organizer</p>
               <Link to="/admin" className={footerLink}>
                 Admin
+              </Link>
+              <Link to="/admin/challenges" className={footerLink}>
+                Challenges
+              </Link>
+              <Link to="/admin/events" className={footerLink}>
+                Events
+              </Link>
+              <Link to="/admin/people" className={footerLink}>
+                People
               </Link>
             </div>
           )}
@@ -60,6 +98,14 @@ export function Footer() {
             </a>
           </div>
         </nav>
+      </div>
+
+      {/* The reference's signature move: the wordmark at display size, edge to
+          edge, in the same ink as the body copy. Clipped, never scrolled. */}
+      <div aria-hidden className="overflow-hidden border-t border-hairline">
+        <p className="select-none whitespace-nowrap text-center font-display text-[clamp(4rem,25vw,20rem)] font-medium leading-[0.82] tracking-[-0.05em] text-primary">
+          {BRAND.name}
+        </p>
       </div>
 
       <div className="border-t border-hairline">

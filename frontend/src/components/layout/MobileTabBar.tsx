@@ -19,7 +19,7 @@ export function MobileTabBar() {
               to={tab.to}
               className={({ isActive }) =>
                 cn(
-                  'relative flex h-16 flex-col items-center justify-center gap-1 type-small',
+                  'flex h-16 flex-col items-center justify-center gap-1.5 type-small',
                   'transition-colors duration-instant',
                   isActive ? 'text-primary' : 'text-muted hover:text-secondary',
                 )
@@ -30,11 +30,12 @@ export function MobileTabBar() {
                   <span
                     aria-hidden
                     className={cn(
-                      'absolute inset-x-[30%] top-0 h-0.5 rounded-pill transition-colors duration-instant',
-                      isActive ? 'bg-accent' : 'bg-transparent',
+                      'grid size-9 place-items-center rounded-pill transition-colors duration-instant',
+                      isActive ? 'bg-elevated text-primary' : 'bg-transparent',
                     )}
-                  />
-                  <Icon name={tab.icon} size={20} strokeWidth={isActive ? 2.1 : 1.8} />
+                  >
+                    <Icon name={tab.icon} size={19} strokeWidth={isActive ? 2.1 : 1.8} />
+                  </span>
                   <span className={isActive ? 'font-semibold' : undefined}>{tab.label}</span>
                 </>
               )}

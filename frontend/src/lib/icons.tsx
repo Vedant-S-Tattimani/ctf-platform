@@ -18,6 +18,7 @@ export type IconName =
   | 'info'
   | 'lock'
   | 'mail'
+  | 'menu'
   | 'moon'
   | 'pause'
   | 'play'
@@ -107,6 +108,7 @@ const paths: Record<IconName, ReactNode> = {
       <path d="m3.5 7 8.5 6 8.5-6" />
     </>
   ),
+  menu: <path d="M4 7h16M4 12h16M4 17h16" />,
   moon: <path d="M20.5 14.8A8.6 8.6 0 1 1 9.2 3.5a7 7 0 0 0 11.3 11.3Z" />,
   pause: <path d="M9 5v14M15 5v14" />,
   play: <path d="M8.5 5.6v12.8L19 12 8.5 5.6Z" />,

@@ -12,6 +12,9 @@ import { cn } from '@/lib/utils';
 export function RootLayout() {
   const { pathname } = useLocation();
   const showTabs = !hidesTabBar(pathname);
+  /* Keyed by page group, not full pathname: the challenge board swaps its panel
+     in place and must not replay the route transition or remount the list. */
+  const section = `/${pathname.split('/')[1] ?? ''}`;
 
   return (
     <div
@@ -24,9 +27,10 @@ export function RootLayout() {
       <ScrollToTop />
       <Navbar />
       <div
+        key={section}
         id="main-content"
         tabIndex={-1}
-        className="min-h-[calc(100svh-4rem)] flex-1 outline-none"
+        className="page-enter min-h-[calc(100svh-4rem)] flex-1 outline-none"
       >
         <Outlet />
       </div>
