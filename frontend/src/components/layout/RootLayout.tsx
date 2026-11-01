@@ -11,7 +11,8 @@ import { cn } from '@/lib/utils';
 
 export function RootLayout() {
   const { pathname } = useLocation();
-  const showTabs = !hidesTabBar(pathname);
+  const isHome = pathname === '/';
+  const showTabs = !isHome && !hidesTabBar(pathname);
 
   return (
     <div
@@ -22,16 +23,19 @@ export function RootLayout() {
     >
       <SkipLink />
       <ScrollToTop />
-      <Navbar />
+      {!isHome && <Navbar />}
       <div
         id="main-content"
         tabIndex={-1}
-        className="min-h-[calc(100svh-4rem)] flex-1 outline-none"
+        className={cn(
+          'flex-1 outline-none',
+          !isHome && 'min-h-[calc(100svh-4rem)]'
+        )}
       >
         <Outlet />
       </div>
-      {!hidesFooter(pathname) && <Footer />}
-      <MobileTabBar />
+      {!isHome && !hidesFooter(pathname) && <Footer />}
+      {!isHome && <MobileTabBar />}
       <CommandPalette />
       <Toaster />
     </div>

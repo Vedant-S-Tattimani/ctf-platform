@@ -42,8 +42,8 @@ export const DragonCursor: React.FC = () => {
     };
     window.addEventListener('pointermove', handlePointerMove, { passive: true });
 
-    // Number of vertebrae segments
-    const N = 32;
+    // Number of vertebrae segments - sleek, compact tail
+    const N = 24;
     const elems: DragonSegment[] = [];
 
     for (let i = 0; i < N; i++) {
@@ -60,16 +60,16 @@ export const DragonCursor: React.FC = () => {
       screen.prepend(elem);
     };
 
-    // Prepend segments: 1 Head ("Cabeza"), 7 & 12 Fins ("Aletas"), rest Spines ("Espina")
+    // Prepend segments: 1 Head ("Cabeza"), 5 & 9 Fins ("Aletas"), rest Spines ("Espina")
     for (let i = 1; i < N; i++) {
       if (i === 1) prepend('Cabeza', i);
-      else if (i === 7 || i === 12) prepend('Aletas', i);
+      else if (i === 5 || i === 9) prepend('Aletas', i);
       else prepend('Espina', i);
     }
 
-    // Scale multiplier to keep the dragon size small and sleek (~0.28x original)
-    const SCALE_FACTOR = 0.28;
-    const SPACING_FACTOR = 0.32;
+    // Scale multiplier to keep the dragon size small and compact (~0.038x)
+    const SCALE_FACTOR = 0.038;
+    const SPACING_FACTOR = 0.045;
 
     let animId: number;
 
@@ -81,8 +81,8 @@ export const DragonCursor: React.FC = () => {
       const ax = (Math.cos(3 * frm) * rad * width) / height;
       const ay = (Math.sin(4 * frm) * rad * height) / width;
 
-      e0.x += (ax + pointer.x - e0.x) / 7;
-      e0.y += (ay + pointer.y - e0.y) / 7;
+      e0.x += (ax + pointer.x - e0.x) / 5;
+      e0.y += (ay + pointer.y - e0.y) / 5;
 
       for (let i = 1; i < N; i++) {
         const e = elems[i];
@@ -92,13 +92,13 @@ export const DragonCursor: React.FC = () => {
         const a = Math.atan2(e.y - ep.y, e.x - ep.x);
 
         // Distance spacing scaled down for compact body
-        const segmentDist = ((100 - i) / 5) * SPACING_FACTOR;
-        e.x += (ep.x - e.x + Math.cos(a) * segmentDist) / 4;
-        e.y += (ep.y - e.y + Math.sin(a) * segmentDist) / 4;
+        const segmentDist = ((70 - i) / 5) * SPACING_FACTOR;
+        e.x += (ep.x - e.x + Math.cos(a) * segmentDist) / 3.5;
+        e.y += (ep.y - e.y + Math.sin(a) * segmentDist) / 3.5;
 
         // Individual segment scale
-        const baseS = (162 + 4 * (1 - i)) / 50;
-        const s = Math.max(0.08, baseS * SCALE_FACTOR);
+        const baseS = (140 + 3 * (1 - i)) / 50;
+        const s = Math.max(0.025, baseS * SCALE_FACTOR);
 
         if (e.use) {
           const midX = (ep.x + e.x) / 2;
