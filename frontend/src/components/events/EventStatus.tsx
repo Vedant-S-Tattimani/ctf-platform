@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { EventState, PublicEvent } from '@/api/types';
-import { formatCompactUTC, formatCountdown } from '@/lib/format';
+import { formatCompactUTC, formatCount, formatCountdown } from '@/lib/format';
 import { cn } from '@/lib/utils';
 
 const STATE_META: Record<
@@ -83,7 +83,7 @@ export function EventStatus({
   const timing = timingLine(event);
 
   if (variant === 'chip') {
-    const countLabel = `${event.challengeCount} ${event.challengeCount === 1 ? 'challenge' : 'challenges'}`;
+    const countLabel = formatCount(event.challengeCount, 'challenge');
     return (
       <Link
         to="/challenges"
@@ -108,10 +108,12 @@ export function EventStatus({
             </span>
           </>
         )}
-        <span aria-hidden className="hidden text-muted lg:inline">
+        {/* The timing is the chip's widest part; below xl it pushes the shell's
+            right-hand group past a 1024 viewport. */}
+        <span aria-hidden className="hidden text-muted xl:inline">
           ·
         </span>
-        <span aria-hidden className="hidden whitespace-nowrap text-secondary lg:inline">
+        <span aria-hidden className="hidden whitespace-nowrap text-secondary xl:inline">
           {timing}
         </span>
       </Link>

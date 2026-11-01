@@ -74,7 +74,7 @@ export function FlagSubmitForm({ challengeId }: { challengeId: string }) {
 
   if (!isAuthenticated) {
     return (
-      <div className="rounded-md border border-hairline bg-elevated p-4 type-small text-secondary">
+      <div className="rounded-lg border border-hairline bg-elevated p-4 type-small text-secondary">
         <Link to="/login" className="font-medium text-accent-strong hover:underline">
           Sign in
         </Link>{' '}
@@ -97,7 +97,7 @@ export function FlagSubmitForm({ challengeId }: { challengeId: string }) {
           autoComplete="off"
           autoCapitalize="off"
           spellCheck={false}
-          className="h-11 min-w-0 flex-1 rounded-md border border-subtle bg-elevated px-3 font-mono text-small text-primary placeholder:text-muted transition-colors duration-instant hover:border-strong focus:outline-none focus-visible:border-accent"
+          className="h-12 min-w-0 flex-1 rounded-md border border-subtle bg-elevated px-4 font-mono text-base text-primary placeholder:text-muted transition-colors duration-instant hover:border-strong focus:outline-none focus-visible:border-accent"
         />
         <Button type="submit" loading={submit.isPending} disabled={!value.trim()}>
           Submit flag
@@ -113,7 +113,7 @@ export function FlagSubmitForm({ challengeId }: { challengeId: string }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className={`rounded-md border px-3 py-2 type-small ${feedbackTone[feedback.tone]}`}
+            className={`rounded-lg border px-4 py-2.5 type-small ${feedbackTone[feedback.tone]}`}
           >
             <span className="font-semibold">{feedback.title}</span>
             {feedback.detail && <span className="ml-2 opacity-80">{feedback.detail}</span>}

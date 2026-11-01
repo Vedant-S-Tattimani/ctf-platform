@@ -13,6 +13,8 @@ interface PageHeaderProps {
   meta?: React.ReactNode;
   breadcrumbs?: Breadcrumb[];
   className?: string;
+  /** Overrides the h1 type step, e.g. when a page-level detail takes the lead. */
+  titleClassName?: string;
 }
 
 export function PageHeader({
@@ -22,6 +24,7 @@ export function PageHeader({
   meta,
   breadcrumbs,
   className,
+  titleClassName,
 }: PageHeaderProps) {
   return (
     <header className={cn('mb-8 flex flex-col gap-5', className)}>
@@ -57,7 +60,7 @@ export function PageHeader({
       )}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="flex min-w-0 flex-col gap-2">
-          <h1 className="type-h1 text-primary">{title}</h1>
+          <h1 className={cn('type-h1 text-primary', titleClassName)}>{title}</h1>
           {description && <p className="max-w-measure text-secondary">{description}</p>}
           {meta && <div className="flex flex-wrap items-center gap-x-3 gap-y-2 type-small text-muted">{meta}</div>}
         </div>

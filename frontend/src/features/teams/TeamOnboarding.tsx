@@ -54,8 +54,11 @@ export function TeamOnboarding() {
   });
 
   return (
-    <div className="grid gap-10 border-b border-hairline pb-10 lg:grid-cols-2 lg:gap-0">
-      <section aria-labelledby="create-team-title" className="lg:pr-10">
+    <div className="grid gap-6 sm:grid-cols-2 sm:gap-8">
+      <section
+        aria-labelledby="create-team-title"
+        className="rounded-lg border border-hairline bg-surface p-6 shadow-card sm:p-8"
+      >
         <h2 id="create-team-title" className="type-h2 text-primary">
           Create a team
         </h2>
@@ -103,7 +106,7 @@ export function TeamOnboarding() {
 
       <section
         aria-labelledby="join-team-title"
-        className="border-t border-hairline pt-10 lg:border-l lg:border-t-0 lg:pl-10 lg:pt-0"
+        className="rounded-lg border border-hairline bg-surface p-6 shadow-card sm:p-8"
       >
         <h2 id="join-team-title" className="type-h2 text-primary">
           Join with an invite code

@@ -1,4 +1,5 @@
 import { useId, useRef } from 'react';
+import { motion } from 'motion/react';
 import { cn } from '@/lib/utils';
 
 export interface TabItem {
@@ -104,7 +105,14 @@ export function Tabs({ label, value, onChange, items, className, panelClassName 
           tabIndex={0}
           className={cn('pt-6 focus-visible:outline-offset-4', panelClassName)}
         >
-          {active.content}
+          <motion.div
+            key={active.value}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
+          >
+            {active.content}
+          </motion.div>
         </div>
       )}
     </div>

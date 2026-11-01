@@ -3,7 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { authApi } from '@/api/auth';
 import { AuthLayout } from '@/components/auth/AuthLayout';
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
+import { PasswordInput } from '@/components/ui/PasswordInput';
 import { useAuth } from '@/hooks/useAuth';
 import { errorMessage, fieldErrorsFromApi } from '@/lib/errors';
 import { toast } from '@/store/toast';
@@ -90,9 +90,8 @@ export default function ResetPassword() {
             {formError}
           </p>
         )}
-        <Input
+        <PasswordInput
           label="New password"
-          type="password"
           name="password"
           autoComplete="new-password"
           required
@@ -101,9 +100,8 @@ export default function ResetPassword() {
           onChange={(event) => setPassword(event.target.value)}
           error={fieldErrors.password}
         />
-        <Input
+        <PasswordInput
           label="Confirm new password"
-          type="password"
           name="confirm"
           autoComplete="new-password"
           required

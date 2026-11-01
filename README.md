@@ -108,6 +108,8 @@ documented in [`backend/.env.example`](backend/.env.example). Highlights:
 | frontend | `npm run typecheck` | TypeScript only |
 | frontend | `npm run build` | Type-check + production bundle |
 | frontend | `npm run preview` | Serve the production bundle |
+| frontend | `node scripts/shoot.mjs --iter=…` | Playwright screenshot sweep + console/overflow report |
+| frontend | `node scripts/perf.mjs` | Cold-cache load metrics on the built bundle |
 
 ## Security model
 
@@ -151,6 +153,22 @@ Latest verified results (Phase 11, fresh production build):
   ≤ 336 KB transferred. Lighthouse itself was not re-run in this pass; the Phase 10 run reported
   **100** desktop and **90–91** mobile performance.
 
+Re-skin verification (Antigravity pass, Phases 6–8, against the built bundle):
+
+- Viewport sweep: **280** page × width × theme records — 10 guest routes at 360/390/412/768/1024,
+  9 player routes and 9 admin routes at the same five widths, both themes — with **0** console errors,
+  **0** failed navigations and **0** records over 1 px of horizontal scroll. An 8-record re-shoot
+  proved the 768 px footer fix.
+- Contrast: computed WCAG ratios for every text-owning element over 28 route × theme × width
+  combinations (light at 360, dark at 1440): **0 AA failures**.
+- Feature audit in a real browser: **15/15** — theme persistence, `Ctrl K` palette navigation, mobile
+  menu, 404, login validation, guest board browsing, wrong-flag submission (`200 {correct:false}` with
+  an inline status), profile save/restore, scoreboard pause, team roster and invite, admin category
+  create/delete round-trip, listing tabs, and a check that the admin editor never renders a flag
+  value.
+- `git diff --stat backend/` is empty for the whole branch: the re-skin changed no schema, route,
+  response shape, env key or backend test.
+
 ## API contract
 
 The HTTP contract — endpoints, payload shapes, error codes and limits — lives in
@@ -167,6 +185,14 @@ The product name lives in a single constant: `frontend/src/lib/brand.ts`. Rename
 Tokens, type scale, motion rules and accessibility floors are documented in
 [`docs/design-rules.md`](docs/design-rules.md); research notes are in
 [`docs/reference-notes.md`](docs/reference-notes.md).
+
+The current visual pass re-skins the frontend toward the Google Antigravity site without copying it.
+Read it in this order: [`docs/antigravity-redesign-plan.md`](docs/antigravity-redesign-plan.md) (the
+brief and phase gates), [`docs/similarity-rubric.md`](docs/similarity-rubric.md) (the 9 × 5 score the
+loop optimises), [`docs/iteration-log.md`](docs/iteration-log.md) (what each iteration changed and
+what the screenshots proved) and [`docs/ui-followups.md`](docs/ui-followups.md) (what is parked, and
+why — mostly things that need a backend change). Evidence lives in `docs/shots/<iteration>/` next to
+a `report.json` per sweep.
 
 ## Known gaps
 
@@ -186,3 +212,5 @@ Tokens, type scale, motion rules and accessibility floors are documented in
 - **Decorative performance trade-offs:** the hero WebGL aurora is paused on touch devices, and
   below-the-fold landing sections mount on first scroll/key/touch intent (with a long fallback).
 - **Admin tables scroll horizontally** from `md` up; smaller viewports use stacked cards instead.
+- **`/__kit` is a dev-route only.** The component gallery is `import.meta.env.DEV`-gated, so the
+  production bundle has no design-system page to point reviewers at; run `npm run dev` for it.

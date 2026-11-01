@@ -301,7 +301,7 @@ export function CommandPalette() {
                           'flex cursor-pointer items-center justify-between gap-3 rounded-md px-3 py-2.5',
                           index === active
                             ? 'bg-elevated text-primary'
-                            : 'text-secondary hover:bg-elevated/60',
+                            : 'text-secondary hover:bg-elevated',
                         )}
                       >
                         <span className="flex min-w-0 items-center gap-2.5">

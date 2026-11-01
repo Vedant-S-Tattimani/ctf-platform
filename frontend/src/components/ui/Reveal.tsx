@@ -9,6 +9,8 @@ interface RevealProps {
   as?: ElementType;
   /** Animate the children instead of the container; pair with .stagger. */
   stagger?: boolean;
+  /** Needed on Tailwind-reset lists, whose native list role is stripped. */
+  role?: 'list';
 }
 
 /**
@@ -22,6 +24,7 @@ export function Reveal({
   delay = 0,
   as: Tag = 'div',
   stagger = false,
+  role,
 }: RevealProps) {
   const ref = useRef<HTMLElement>(null);
   const [visible, setVisible] = useState(false);
@@ -50,6 +53,7 @@ export function Reveal({
   return (
     <Tag
       ref={ref}
+      role={role}
       data-visible={visible ? 'true' : 'false'}
       className={cn(!stagger && 'reveal', !stagger && visible && 'reveal-visible', className)}
       style={delay ? ({ '--reveal-delay': `${delay}ms` } as CSSProperties) : undefined}

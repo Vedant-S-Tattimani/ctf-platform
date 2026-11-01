@@ -2,16 +2,21 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { authApi } from '@/api/auth';
+import { scoreboardApi } from '@/api/scoreboard';
 import { usersApi } from '@/api/users';
 import { PageShell } from '@/components/layout/PageShell';
+import { Avatar } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
 import { Button, buttonVariants } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { Segmented } from '@/components/ui/Segmented';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Tabs } from '@/components/ui/Tabs';
 import { useAuth } from '@/hooks/useAuth';
 import { errorMessage } from '@/lib/errors';
-import { formatDateUTC } from '@/lib/format';
+import { formatDateUTC, formatPoints } from '@/lib/format';
+import { useTheme } from '@/store/theme';
+import type { ThemeMode } from '@/store/theme';
 import { toast } from '@/store/toast';
 
 type AccountTab = 'profile' | 'account' | 'team';
@@ -20,6 +25,8 @@ export default function Account() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { logout } = useAuth();
+  const mode = useTheme((state) => state.mode);
+  const setMode = useTheme((state) => state.setMode);
   const [tab, setTab] = useState<AccountTab>('profile');
   const [signingOut, setSigningOut] = useState(false);
   const [resending, setResending] = useState(false);
@@ -29,6 +36,16 @@ export default function Account() {
     queryFn: usersApi.me,
   });
   const user = data?.user;
+
+  // Shared cache key with the Teams page: the standing strip costs no extra
+  // request when the board has already been opened in this session.
+  const board = useQuery({
+    queryKey: ['scoreboard', 'list', 'teams'],
+    queryFn: ({ signal }) => scoreboardApi.list({ scope: 'teams', limit: 100 }, signal),
+  });
+  const teamStanding = user?.teamId
+    ? (board.data?.entries.find((entry) => entry.id === user.teamId) ?? null)
+    : null;
 
   const [bio, setBio] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
@@ -116,15 +133,23 @@ export default function Account() {
             value: 'profile',
             label: 'Profile',
             content: (
-              <section aria-labelledby="profile-settings-title" className="max-w-xl">
-                <h2 id="profile-settings-title" className="type-h3 text-primary">
-                  Public profile
-                </h2>
-                <p className="mt-1 type-small text-secondary">
-                  Shown to other players on the scoreboard and team pages.
-                </p>
+              <section
+                aria-labelledby="profile-settings-title"
+                className="max-w-3xl rounded-lg border border-hairline bg-surface p-6 shadow-soft lg:p-8"
+              >
+                <div className="flex items-center gap-4">
+                  <Avatar name={user.username} src={avatarUrl.trim() || user.avatarUrl} size="lg" />
+                  <div className="min-w-0">
+                    <h2 id="profile-settings-title" className="type-h3 text-primary">
+                      Public profile
+                    </h2>
+                    <p className="mt-1 type-small text-secondary">
+                      Shown to other players on the scoreboard and team pages.
+                    </p>
+                  </div>
+                </div>
                 <form
-                  className="mt-5 flex flex-col gap-5"
+                  className="mt-6 flex flex-col gap-5 border-t border-hairline pt-6"
                   onSubmit={(event) => {
                     event.preventDefault();
                     updateProfile.mutate();
@@ -165,7 +190,10 @@ export default function Account() {
             value: 'account',
             label: 'Account',
             content: (
-              <section aria-labelledby="account-details-title" className="max-w-xl">
+              <section
+                aria-labelledby="account-details-title"
+                className="max-w-3xl rounded-lg border border-hairline bg-surface p-6 shadow-soft lg:p-8"
+              >
                 <h2 id="account-details-title" className="type-h3 text-primary">
                   Sign-in details
                 </h2>
@@ -213,6 +241,22 @@ export default function Account() {
                   </div>
                 </dl>
                 <div className="mt-6 border-t border-hairline pt-6">
+                  <h3 className="type-label text-muted">Appearance</h3>
+                  <p className="mt-2 mb-3 type-small text-secondary">
+                    Follow the device theme, or pin one for this browser.
+                  </p>
+                  <Segmented
+                    label="Appearance"
+                    value={mode}
+                    onChange={(value: ThemeMode) => setMode(value)}
+                    options={[
+                      { value: 'light', label: 'Light' },
+                      { value: 'dark', label: 'Dark' },
+                      { value: 'system', label: 'System' },
+                    ]}
+                  />
+                </div>
+                <div className="mt-6 border-t border-hairline pt-6">
                   <h3 className="type-label text-muted">Password</h3>
                   <p className="mt-2 type-small text-secondary">
                     Request a single-use link by email to set a new password. Links expire after one
@@ -243,10 +287,31 @@ export default function Account() {
             value: 'team',
             label: 'Team',
             content: (
-              <section aria-labelledby="team-summary-title" className="max-w-xl">
-                <h2 id="team-summary-title" className="type-h3 text-primary">
-                  Team
-                </h2>
+              <section
+                aria-labelledby="team-summary-title"
+                className="max-w-3xl rounded-lg border border-hairline bg-surface p-6 shadow-soft lg:p-8"
+              >
+                <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+                  <h2 id="team-summary-title" className="type-h3 text-primary">
+                    Team
+                  </h2>
+                  {teamStanding && (
+                    <dl className="flex items-center gap-6 type-small">
+                      <div className="flex items-baseline gap-1.5">
+                        <dt className="text-muted">Rank</dt>
+                        <dd className="nums font-mono font-semibold text-accent-strong">
+                          #{teamStanding.rank}
+                        </dd>
+                      </div>
+                      <div className="flex items-baseline gap-1.5">
+                        <dt className="text-muted">Points</dt>
+                        <dd className="nums font-mono font-semibold text-primary">
+                          {formatPoints(teamStanding.points)}
+                        </dd>
+                      </div>
+                    </dl>
+                  )}
+                </div>
                 {user.teamId ? (
                   <>
                     <p className="mt-2 text-secondary">

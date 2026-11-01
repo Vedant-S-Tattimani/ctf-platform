@@ -5,10 +5,11 @@ import { Button, buttonVariants } from '@/components/ui/Button';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { Input } from '@/components/ui/Input';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { Reveal } from '@/components/ui/Reveal';
 import { Segmented } from '@/components/ui/Segmented';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { errorMessage } from '@/lib/errors';
-import { difficultyLabel, difficultyTone, formatPoints } from '@/lib/format';
+import { difficultyLabel, difficultyTone, formatCount, formatPoints } from '@/lib/format';
 import { useAdminChallenges } from './queries';
 
 type StateFilter = 'all' | 'published' | 'draft';
@@ -43,7 +44,7 @@ export function AdminChallenges() {
         }
       />
 
-      <div className="flex flex-col gap-3 border-y border-hairline py-3 sm:flex-row sm:items-end sm:justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div className="w-full sm:max-w-xs">
           <Input
             label="Search"
@@ -54,7 +55,11 @@ export function AdminChallenges() {
         </div>
         <div className="flex flex-wrap items-end gap-3">
           <p className="type-small text-muted">
-            {data ? `${items.length} of ${data.challenges.length} · ${live} live` : 'Loading…'}
+            {data
+              ? filterActive
+                ? `${items.length} of ${data.challenges.length} shown`
+                : `${live} of ${data.challenges.length} live`
+              : 'Loading…'}
           </p>
           <Segmented
             label="Publish state"
@@ -83,7 +88,7 @@ export function AdminChallenges() {
           onRetry={() => void refetch()}
         />
       ) : items.length === 0 ? (
-        <div className="border-y border-hairline py-12 text-center">
+        <div className="rounded-lg border border-hairline bg-surface p-6 text-center shadow-card sm:p-8">
           <p className="type-h3 text-primary">No challenges here</p>
           <p className="mx-auto mt-2 max-w-measure text-secondary">
             {data?.challenges.length === 0
@@ -113,11 +118,14 @@ export function AdminChallenges() {
           )}
         </div>
       ) : (
-        <>
-          <ul className="border-t border-hairline md:hidden">
+        <Reveal>
+          <ul className="divide-y divide-hairline overflow-hidden rounded-lg border border-hairline bg-surface px-3 shadow-card sm:px-4 md:hidden">
             {items.map((challenge) => (
-              <li key={challenge.id} className="border-b border-hairline">
-                <Link to={`/admin/challenges/${challenge.id}`} className="flex flex-col gap-2 py-3">
+              <li key={challenge.id}>
+                <Link
+                  to={`/admin/challenges/${challenge.id}`}
+                  className="-mx-3 flex flex-col gap-2 rounded-md px-3 py-3 transition-colors duration-instant hover:bg-elevated sm:-mx-4 sm:px-4"
+                >
                   <span className="flex items-start justify-between gap-3">
                     <span className="min-w-0">
                       <span className="block truncate text-primary">{challenge.title}</span>
@@ -133,8 +141,8 @@ export function AdminChallenges() {
                     <Badge tone={difficultyTone(challenge.difficulty)}>
                       {difficultyLabel(challenge.difficulty)}
                     </Badge>
-                    <span>{challenge._count.flags ?? 0} flags</span>
-                    <span>{challenge._count.solves ?? 0} solves</span>
+                    <span>{formatCount(challenge._count.flags ?? 0, 'flag')}</span>
+                    <span>{formatCount(challenge._count.solves ?? 0, 'solve')}</span>
                     <span className="truncate">{challenge.event?.name ?? 'No event'}</span>
                   </span>
                 </Link>
@@ -142,80 +150,82 @@ export function AdminChallenges() {
             ))}
           </ul>
 
-          <div className="hidden overflow-x-auto md:block">
-            <table className="w-full min-w-[44rem] border-collapse text-left">
-              <thead>
-                <tr className="border-b border-hairline type-label text-muted">
-                  <th scope="col" className="py-2.5 pr-4 font-medium">
-                    Challenge
-                  </th>
-                  <th scope="col" className="px-4 py-2.5 font-medium">
-                    Difficulty
-                  </th>
-                  <th scope="col" className="px-4 py-2.5 text-right font-medium">
-                    Points
-                  </th>
-                  <th scope="col" className="px-4 py-2.5 text-right font-medium">
-                    Flags
-                  </th>
-                  <th scope="col" className="px-4 py-2.5 text-right font-medium">
-                    Solves
-                  </th>
-                  <th scope="col" className="px-4 py-2.5 font-medium">
-                    Status
-                  </th>
-                  <th scope="col" className="py-2.5 pl-4 text-right">
-                    <span className="sr-only">Actions</span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {items.map((challenge) => (
-                  <tr key={challenge.id} className="border-b border-hairline hover:bg-elevated">
-                    <td className="py-3 pr-4">
-                      <Link
-                        to={`/admin/challenges/${challenge.id}`}
-                        className="font-medium text-primary transition-colors duration-instant hover:text-accent-strong"
-                      >
-                        {challenge.title}
-                      </Link>
-                      <span className="block type-small text-muted">
-                        {challenge.category.name} · {challenge.event?.name ?? 'No event'}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <Badge tone={difficultyTone(challenge.difficulty)}>
-                        {difficultyLabel(challenge.difficulty)}
-                      </Badge>
-                    </td>
-                    <td className="nums px-4 py-3 text-right font-mono text-small text-secondary">
-                      {formatPoints(challenge.points)}
-                    </td>
-                    <td className="nums px-4 py-3 text-right text-secondary">
-                      {challenge._count.flags ?? 0}
-                    </td>
-                    <td className="nums px-4 py-3 text-right text-secondary">
-                      {challenge._count.solves ?? 0}
-                    </td>
-                    <td className="px-4 py-3">
-                      <Badge tone={challenge.published ? 'success' : 'neutral'}>
-                        {challenge.published ? 'Live' : 'Draft'}
-                      </Badge>
-                    </td>
-                    <td className="py-3 pl-4 text-right">
-                      <Link
-                        to={`/admin/challenges/${challenge.id}`}
-                        className={buttonVariants('ghost', 'sm')}
-                      >
-                        Edit
-                      </Link>
-                    </td>
+          <div className="hidden overflow-hidden rounded-lg border border-hairline bg-surface px-4 py-2 shadow-card md:block">
+            <div className="overflow-x-auto">
+                <table className="w-full min-w-[44rem] border-collapse text-left">
+                <thead>
+                  <tr className="border-b border-hairline type-label text-muted">
+                    <th scope="col" className="py-2.5 pr-4 font-medium">
+                      Challenge
+                    </th>
+                    <th scope="col" className="px-4 py-2.5 font-medium">
+                      Difficulty
+                    </th>
+                    <th scope="col" className="px-4 py-2.5 text-right font-medium">
+                      Points
+                    </th>
+                    <th scope="col" className="px-4 py-2.5 text-right font-medium">
+                      Flags
+                    </th>
+                    <th scope="col" className="px-4 py-2.5 text-right font-medium">
+                      Solves
+                    </th>
+                    <th scope="col" className="px-4 py-2.5 font-medium">
+                      Status
+                    </th>
+                    <th scope="col" className="py-2.5 pl-4 text-right">
+                      <span className="sr-only">Actions</span>
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {items.map((challenge) => (
+                    <tr key={challenge.id} className="border-b border-hairline last:border-b-0 hover:bg-elevated">
+                      <td className="py-3 pr-4">
+                        <Link
+                          to={`/admin/challenges/${challenge.id}`}
+                          className="font-medium text-primary transition-colors duration-instant hover:text-accent-strong"
+                        >
+                          {challenge.title}
+                        </Link>
+                        <span className="block type-small text-muted">
+                          {challenge.category.name} · {challenge.event?.name ?? 'No event'}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <Badge tone={difficultyTone(challenge.difficulty)}>
+                          {difficultyLabel(challenge.difficulty)}
+                        </Badge>
+                      </td>
+                      <td className="nums px-4 py-3 text-right font-mono text-small text-secondary">
+                        {formatPoints(challenge.points)}
+                      </td>
+                      <td className="nums px-4 py-3 text-right text-secondary">
+                        {challenge._count.flags ?? 0}
+                      </td>
+                      <td className="nums px-4 py-3 text-right text-secondary">
+                        {challenge._count.solves ?? 0}
+                      </td>
+                      <td className="px-4 py-3">
+                        <Badge tone={challenge.published ? 'success' : 'neutral'}>
+                          {challenge.published ? 'Live' : 'Draft'}
+                        </Badge>
+                      </td>
+                      <td className="py-3 pl-4 text-right">
+                        <Link
+                          to={`/admin/challenges/${challenge.id}`}
+                          className={buttonVariants('ghost', 'sm')}
+                        >
+                          Edit
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </>
+        </Reveal>
       )}
     </section>
   );

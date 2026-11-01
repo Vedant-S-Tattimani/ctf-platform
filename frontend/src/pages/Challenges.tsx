@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorState } from '@/components/ui/ErrorState';
+import { Reveal } from '@/components/ui/Reveal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { ChallengeFilters } from '@/features/challenges/ChallengeFilters';
 import type {
@@ -18,7 +19,7 @@ import { ChallengePanel } from '@/features/challenges/ChallengePanel';
 import { useChallenges } from '@/features/challenges/queries';
 import { useAuth } from '@/hooks/useAuth';
 import { errorMessage } from '@/lib/errors';
-import { difficultyLabel, formatPoints } from '@/lib/format';
+import { difficultyLabel, formatCount, formatPoints } from '@/lib/format';
 import { Icon } from '@/lib/icons';
 import { cn } from '@/lib/utils';
 
@@ -128,6 +129,9 @@ export default function Challenges() {
     <main className="mx-auto w-full max-w-container px-4 py-8 sm:px-6 lg:py-10">
       <PageHeader
         className={cn(challengeId && 'hidden lg:flex')}
+        // With a challenge open the brief is the subject of the page, so the
+        // section title steps down and the challenge title takes the h1 scale.
+        titleClassName={challengeId ? 'type-h2' : undefined}
         title="Challenges"
         description="Read the brief, work the target, submit the flag. The board updates the moment a solve lands."
         actions={
@@ -135,9 +139,7 @@ export default function Challenges() {
             <Badge tone="neutral">Loading</Badge>
           ) : (
             <>
-              <Badge tone="neutral">
-                {challenges.length} {challenges.length === 1 ? 'challenge' : 'challenges'}
-              </Badge>
+              <Badge tone="neutral">{formatCount(challenges.length, 'challenge')}</Badge>
               {isAuthenticated && (
                 <Badge tone="accent">
                   {solvedCount} solved
@@ -163,7 +165,12 @@ export default function Challenges() {
       <div className="grid gap-8 lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)] lg:gap-0">
         <section
           aria-label="Challenge board"
-          className={cn('min-w-0', challengeId && 'hidden lg:block')}
+          className={cn(
+            'min-w-0',
+            // Master/detail: on mobile the panel replaces the list; on desktop the
+            // list pins under the navbar while a longer brief scrolls past.
+            challengeId && 'hidden lg:sticky lg:top-16 lg:block lg:self-start lg:pr-2',
+          )}
         >
           {isPending ? (
             <div className="flex flex-col gap-2" aria-busy="true">
@@ -185,11 +192,11 @@ export default function Challenges() {
             />
           ) : (
             <>
-              <div className="mb-2 flex items-center justify-between gap-3 border-b border-hairline pb-2">
+              <div className="mb-2 flex items-center justify-between gap-3 border-b border-hairline py-1 pr-2 pl-3">
                 <div className="flex items-center gap-3">
                   <p className="type-label text-muted">
                     {filtered.length === challenges.length
-                      ? `${challenges.length} challenges`
+                      ? formatCount(challenges.length, 'challenge')
                       : `${filtered.length} of ${challenges.length}`}
                   </p>
                   {filterActive && (
@@ -218,7 +225,7 @@ export default function Challenges() {
                   }
                 />
               ) : (
-                <ul className="flex flex-col" role="list">
+                <Reveal as="ul" stagger role="list" className="flex flex-col">
                   {filtered.map((challenge) => {
                     const selected = challenge.id === challengeId;
                     return (
@@ -234,28 +241,40 @@ export default function Challenges() {
                             'group grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 border-b border-hairline border-l-2 py-3 pl-3 pr-2',
                             'transition-colors duration-instant',
                             selected
-                              ? 'border-l-accent bg-accent-faint/40'
+                              ? 'band-tint border-l-accent bg-accent-faint'
                               : 'border-l-transparent hover:bg-elevated',
                           )}
                         >
                           <span
                             aria-hidden
-                            className="size-2 rounded-pill"
+                            className="size-2 rounded-pill transition-transform duration-fast ease-decel group-hover:scale-150 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
                             style={{ backgroundColor: challenge.category.color ?? 'var(--accent)' }}
                           />
                           <span className="flex min-w-0 flex-col gap-0.5">
-                            <span className="truncate text-primary">{challenge.title}</span>
+                            <span
+                              className={cn(
+                                'truncate',
+                                challenge.solvedByMe ? 'text-secondary' : 'text-primary',
+                              )}
+                            >
+                              {challenge.title}
+                            </span>
                             <span className="type-small truncate text-muted">
                               {challenge.category.name} · {difficultyLabel(challenge.difficulty)}
                               {challenge.flagsTotal > 1 &&
-                                ` · ${challenge.flagsSolved}/${challenge.flagsTotal} flags`}
+                                ` · ${challenge.flagsTotal} flags`}
                             </span>
                           </span>
                           <span className="flex shrink-0 items-center gap-2.5">
                             {challenge.solvedByMe && (
                               <Icon name="check" size={14} label="Solved" className="text-success" />
                             )}
-                            <span className="nums font-mono text-small text-accent-strong">
+                            <span
+                              className={cn(
+                                'nums font-mono text-small',
+                                selected ? 'text-accent-strong' : 'text-primary',
+                              )}
+                            >
                               {formatPoints(challenge.currentPoints)}
                             </span>
                           </span>
@@ -263,7 +282,7 @@ export default function Challenges() {
                       </li>
                     );
                   })}
-                </ul>
+                </Reveal>
               )}
 
               {filterActive && filtered.length > 0 && (

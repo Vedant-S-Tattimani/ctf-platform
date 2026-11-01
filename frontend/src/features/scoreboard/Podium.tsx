@@ -3,7 +3,7 @@ import type { ScoreboardEntry } from '@/api/types';
 import { Avatar } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
 import { Skeleton } from '@/components/ui/Skeleton';
-import { formatPoints } from '@/lib/format';
+import { formatCount, formatPoints } from '@/lib/format';
 import { cn } from '@/lib/utils';
 
 interface PodiumProps {
@@ -14,12 +14,16 @@ interface PodiumProps {
 
 const rankLabel = (rank: number) => String(rank).padStart(2, '0');
 
+/** The podium card, shared by the live and loading shapes so nothing jumps. */
+const podiumShell =
+  'rounded-lg border border-hairline bg-surface p-6 shadow-card sm:p-8';
+
 /** Reserves the podium's footprint while the first board fetch is in flight. */
 export function PodiumSkeleton() {
   return (
-    <section aria-hidden aria-busy="true" className="border-y border-hairline">
+    <section aria-hidden aria-busy="true" className={podiumShell}>
       <div className="grid sm:grid-cols-[1.4fr_1fr]">
-        <div className="flex flex-col gap-6 py-7 sm:pr-10">
+        <div className="flex flex-col gap-6 sm:pr-10">
           <Skeleton className="h-3.5 w-36" />
           <div className="flex items-center gap-4">
             <Skeleton className="size-14 rounded-pill" />
@@ -51,18 +55,20 @@ export function PodiumSkeleton() {
 }
 
 export function Podium({ entries, scope, highlightId }: PodiumProps) {
-  const [first, ...rest] = entries;
+  const [first, runner] = entries;
   if (!first) return null;
   const href = (id: string) => (scope === 'teams' ? `/teams/${id}` : `/users/${id}`);
   const label = scope === 'teams' ? 'team' : 'player';
+  const rest = entries.slice(1);
+  const margin = runner ? first.points - runner.points : null;
 
   return (
-    <section aria-labelledby="podium-title" className="border-y border-hairline">
+    <section aria-labelledby="podium-title" className={podiumShell}>
       <h2 id="podium-title" className="sr-only">
         Top three
       </h2>
       <div className={cn('grid', rest.length > 0 && 'sm:grid-cols-[1.4fr_1fr]')}>
-        <div className="flex flex-col gap-6 py-7 sm:pr-10">
+        <div className="flex flex-col gap-6 sm:pr-10">
           <p className="flex items-center gap-2 type-label text-muted">
             <span aria-hidden className="nums font-mono text-accent-strong">
               01
@@ -85,20 +91,49 @@ export function Podium({ entries, scope, highlightId }: PodiumProps) {
                 <span>points</span>
                 <span aria-hidden>·</span>
                 <span>
-                  {first.solveCount} {first.solveCount === 1 ? 'solve' : 'solves'}
+                  {formatCount(first.solveCount, 'solve')}
                 </span>
                 {first.memberCount !== null && (
                   <>
                     <span aria-hidden>·</span>
-                    <span>
-                      {first.memberCount} {first.memberCount === 1 ? 'member' : 'members'}
-                    </span>
+                    <span>{formatCount(first.memberCount, 'member')}</span>
                   </>
                 )}
                 {first.id === highlightId && <Badge tone="accent">You</Badge>}
               </p>
             </div>
           </div>
+
+          {runner && margin !== null && (
+            <p className="border-t border-hairline pt-5 type-small text-muted">
+              {margin > 0 ? (
+                <>
+                  <span className="nums font-mono font-semibold text-success">
+                    +{formatPoints(margin)}
+                  </span>{' '}
+                  clear of{' '}
+                  <Link
+                    to={href(runner.id)}
+                    className="rounded-sm text-secondary transition-colors duration-instant hover:text-primary"
+                  >
+                    {runner.name}
+                  </Link>{' '}
+                  in second
+                </>
+              ) : (
+                <>
+                  Level with{' '}
+                  <Link
+                    to={href(runner.id)}
+                    className="rounded-sm text-secondary transition-colors duration-instant hover:text-primary"
+                  >
+                    {runner.name}
+                  </Link>{' '}
+                  on points — tie-break decides the order.
+                </>
+              )}
+            </p>
+          )}
         </div>
 
         {rest.length > 0 && (
@@ -121,7 +156,7 @@ export function Podium({ entries, scope, highlightId }: PodiumProps) {
                       )}
                     </span>
                     <span className="type-small text-muted">
-                      {entry.solveCount} {entry.solveCount === 1 ? 'solve' : 'solves'}
+                      {formatCount(entry.solveCount, 'solve')}
                     </span>
                   </span>
                   <span className="nums shrink-0 font-mono font-semibold text-primary">

@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
+import { motion } from 'motion/react';
 import { ApiError } from '@/api/client';
 import type { ChallengeDetail, ChallengeFile, PublicHint } from '@/api/types';
 import { Badge } from '@/components/ui/Badge';
@@ -16,6 +17,7 @@ import {
   difficultyLabel,
   difficultyTone,
   formatBytes,
+  formatCount,
   formatPoints,
   isHttpUrl,
 } from '@/lib/format';
@@ -89,7 +91,15 @@ export function ChallengePanel({ challengeId }: ChallengePanelProps) {
   return (
     <article className="flex flex-col gap-8 pb-4 pt-2">
       {backLink}
-      <ChallengeBody challenge={data.challenge} />
+      <motion.div
+        key={data.challenge.id}
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
+        className="flex flex-col gap-8"
+      >
+        <ChallengeBody challenge={data.challenge} />
+      </motion.div>
     </article>
   );
 }
@@ -118,7 +128,7 @@ function ChallengeBody({ challenge }: { challenge: ChallengeDetail }) {
 
   return (
     <>
-      <header className="flex flex-col gap-3">
+      <header className="flex flex-col gap-4 border-b border-hairline pb-6">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-2 type-small text-secondary">
           <span className="flex items-center gap-2">
             <span
@@ -134,9 +144,7 @@ function ChallengeBody({ challenge }: { challenge: ChallengeDetail }) {
           <span className="nums font-mono font-semibold text-accent-strong">
             {formatPoints(challenge.currentPoints)} pts
           </span>
-          <span className="text-muted">
-            {challenge.solveCount} {challenge.solveCount === 1 ? 'solve' : 'solves'}
-          </span>
+          <span className="text-muted">{formatCount(challenge.solveCount, 'solve')}</span>
           {challenge.solvedByMe && <Badge tone="success">Solved</Badge>}
           {challenge.firstBloodByMe && <Badge tone="accent">First blood by you</Badge>}
         </div>
@@ -151,7 +159,7 @@ function ChallengeBody({ challenge }: { challenge: ChallengeDetail }) {
         <h2
           ref={desktopTitleRef}
           tabIndex={-1}
-          className="hidden type-h2 text-primary outline-none lg:block"
+          className="hidden type-h1 text-primary outline-none lg:block"
         >
           {challenge.title}
         </h2>
@@ -171,7 +179,7 @@ function ChallengeBody({ challenge }: { challenge: ChallengeDetail }) {
         )}
       </header>
 
-      <p className="max-w-measure whitespace-pre-line leading-relaxed text-secondary">
+      <p className="max-w-measure whitespace-pre-line text-[1.0625rem] leading-relaxed text-secondary">
         {challenge.description}
       </p>
 
@@ -180,13 +188,28 @@ function ChallengeBody({ challenge }: { challenge: ChallengeDetail }) {
           <h2 id={targetsId} className="type-h3 text-primary">
             Targets
           </h2>
-          <ul className="overflow-hidden rounded-md border border-hairline">
+          <ul className="max-w-3xl overflow-hidden rounded-lg border border-hairline bg-surface shadow-soft">
             {challenge.flags.map((flag, index) => (
               <li
                 key={flag.id}
-                className="flex items-center justify-between gap-3 border-b border-hairline bg-surface px-3 py-2.5 type-small last:border-b-0"
+                className="flex items-center justify-between gap-3 border-b border-hairline px-4 py-3 type-small last:border-b-0"
               >
-                <span className="flex min-w-0 items-center gap-2">
+                <span className="flex min-w-0 items-center gap-2.5">
+                  <span
+                    aria-hidden
+                    className={cn(
+                      'grid size-5 shrink-0 place-items-center rounded-pill border',
+                      flag.solvedByMe
+                        ? 'border-success bg-success-faint text-success'
+                        : 'border-subtle text-muted',
+                    )}
+                  >
+                    {flag.solvedByMe ? (
+                      <Icon name="check" size={12} />
+                    ) : (
+                      <span className="size-1.5 rounded-pill bg-current" />
+                    )}
+                  </span>
                   <span className="truncate text-primary">{flag.label ?? `Flag ${index + 1}`}</span>
                   <span className="nums font-mono text-muted">{flag.currentPoints} pts</span>
                 </span>
@@ -214,20 +237,22 @@ function ChallengeBody({ challenge }: { challenge: ChallengeDetail }) {
         </section>
       )}
 
-      <section aria-labelledby={submitId} className="flex flex-col gap-4 border-t border-hairline pt-6">
-        {allSolved ? (
-          <p className="rounded-md border border-success bg-success-faint px-3 py-2.5 type-small text-success">
-            Every flag on this challenge is on your record.
-          </p>
-        ) : (
-          <>
-            <h2 id={submitId} className="type-h3 text-primary">
-              Submit a flag
-            </h2>
-            <FlagSubmitForm challengeId={challenge.id} />
-          </>
-        )}
-      </section>
+      {allSolved ? (
+        <p className="flex max-w-3xl items-center gap-2 rounded-lg border border-success bg-success-faint px-4 py-3 type-small text-success">
+          <Icon name="check" size={14} />
+          Every flag on this challenge is on your record.
+        </p>
+      ) : (
+        <section
+          aria-labelledby={submitId}
+          className="flex max-w-3xl flex-col gap-4 rounded-lg border border-hairline bg-surface p-5 shadow-card lg:p-6"
+        >
+          <h2 id={submitId} className="type-h3 text-primary">
+            Submit a flag
+          </h2>
+          <FlagSubmitForm challengeId={challenge.id} />
+        </section>
+      )}
     </>
   );
 }
@@ -247,8 +272,8 @@ function FileList({ files }: { files: ChallengeFile[] }) {
   );
 
   return (
-    <div className="flex flex-col gap-2">
-      <ul className="overflow-hidden rounded-md border border-hairline">
+    <div className="flex max-w-3xl flex-col gap-2">
+      <ul className="overflow-hidden rounded-lg border border-hairline bg-surface shadow-soft">
         {files.map((file) => {
           const size = formatBytes(file.sizeBytes);
           const path = file.path;
@@ -256,7 +281,7 @@ function FileList({ files }: { files: ChallengeFile[] }) {
           return (
             <li
               key={file.id}
-              className="flex items-center justify-between gap-3 border-b border-hairline bg-surface px-3 py-2.5 last:border-b-0"
+              className="flex items-center justify-between gap-3 border-b border-hairline px-4 py-3 last:border-b-0"
             >
               <span className="flex min-w-0 items-center gap-2 type-small">
                 <Icon name={href ? 'download' : 'copy'} size={14} className="text-muted" />
@@ -360,12 +385,12 @@ function HintsSection({
           {spent > 0 && ` · ${formatPoints(spent)} pts spent`}
         </span>
       </div>
-      <ul className="flex flex-col gap-2">
+      <ul className="flex max-w-3xl flex-col gap-2">
         {hints.map((hint, index) => (
           <li key={hint.id}>
             {hint.unlocked && hint.content !== null ? (
-              <details className="group rounded-md border border-hairline bg-surface">
-                <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 px-3 py-2 type-small text-secondary transition-colors duration-instant hover:text-primary marker:content-none [&::-webkit-details-marker]:hidden">
+              <details className="group rounded-lg border border-hairline bg-surface shadow-soft">
+                <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 type-small text-secondary transition-colors duration-instant hover:text-primary marker:content-none [&::-webkit-details-marker]:hidden">
                   <span className="flex items-center gap-2">
                     <Icon name="info" size={14} className="text-muted" />
                     Hint {index + 1}
@@ -375,12 +400,12 @@ function HintsSection({
                     <Chevron />
                   </span>
                 </summary>
-                <p className="border-t border-hairline px-3 py-2.5 type-small leading-relaxed text-secondary">
+                <p className="border-t border-hairline px-4 py-3 type-small leading-relaxed text-secondary">
                   {hint.content}
                 </p>
               </details>
             ) : (
-              <div className="rounded-md border border-hairline bg-surface px-3 py-2.5">
+              <div className="rounded-lg border border-hairline bg-surface px-4 py-3 shadow-soft">
                 <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 type-small">
                   <span className="flex items-center gap-2 text-secondary">
                     <Icon name="lock" size={14} className="text-muted" />

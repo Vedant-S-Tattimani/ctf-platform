@@ -6,12 +6,13 @@ import { PageShell } from '@/components/layout/PageShell';
 import { Button } from '@/components/ui/Button';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { Segmented } from '@/components/ui/Segmented';
+import { Reveal } from '@/components/ui/Reveal';
 import { Podium, PodiumSkeleton } from '@/features/scoreboard/Podium';
 import { ScoreChart } from '@/features/scoreboard/ScoreChart';
 import { ScoreboardTable } from '@/features/scoreboard/ScoreboardTable';
 import { useAuth } from '@/hooks/useAuth';
 import { errorMessage } from '@/lib/errors';
-import { formatDateTimeUTC, formatPoints } from '@/lib/format';
+import { formatCount, formatDateTimeUTC, formatPoints } from '@/lib/format';
 import { Icon } from '@/lib/icons';
 import { cn } from '@/lib/utils';
 
@@ -52,6 +53,17 @@ export default function Scoreboard() {
   const updatedAt = board.dataUpdatedAt ? new Date(board.dataUpdatedAt).toISOString() : null;
   const scopeLabel = scope === 'teams' ? 'team' : 'player';
   const href = (id: string) => (scope === 'teams' ? `/teams/${id}` : `/users/${id}`);
+
+  // The empty board already ships its own bordered state, so the card shell is
+  // only added around real rows or the loading skeleton.
+  const table = (
+    <ScoreboardTable
+      entries={entries}
+      scope={scope}
+      highlightId={highlightId}
+      isPending={board.isPending}
+    />
+  );
 
   return (
     <PageShell
@@ -120,7 +132,7 @@ export default function Scoreboard() {
             {ownEntry && ownEntry.rank > 3 && (
               <section
                 aria-label="Your position"
-                className="flex flex-wrap items-center gap-x-4 gap-y-1 border-y border-accent bg-accent-faint px-4 py-3"
+                className="band-tint flex flex-wrap items-center gap-x-4 gap-y-1 rounded-lg border border-accent bg-accent-faint px-4 py-3 shadow-soft"
               >
                 <span className="type-label text-accent-strong">Your position</span>
                 <span className="nums font-mono text-small text-muted">#{ownEntry.rank}</span>
@@ -132,7 +144,7 @@ export default function Scoreboard() {
                 </Link>
                 {scope === 'teams' && ownEntry.memberCount !== null && (
                   <span className="type-small text-muted">
-                    {ownEntry.memberCount} {ownEntry.memberCount === 1 ? 'member' : 'members'}
+                    {formatCount(ownEntry.memberCount, 'member')}
                   </span>
                 )}
                 <span className="ml-auto flex items-baseline gap-2">
@@ -145,25 +157,30 @@ export default function Scoreboard() {
             )}
 
             {scope === 'teams' && (board.isPending || entries.length > 0) && (
-              <ScoreChart series={history.data?.series ?? []} isPending={history.isPending} />
+              <Reveal>
+                <ScoreChart series={history.data?.series ?? []} isPending={history.isPending} />
+              </Reveal>
             )}
 
-            <section aria-labelledby="full-board-title">
-              <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-hairline pb-4">
-                <h2 id="full-board-title" className="type-h3 text-primary">
-                  Full board
-                </h2>
-                <span className="type-small text-muted">
-                  Every {scopeLabel} with at least one solve
-                </span>
-              </div>
-              <ScoreboardTable
-                entries={entries}
-                scope={scope}
-                highlightId={highlightId}
-                isPending={board.isPending}
-              />
-            </section>
+            <Reveal>
+              <section aria-labelledby="full-board-title">
+                <div className="flex flex-wrap items-baseline justify-between gap-2 pb-4">
+                  <h2 id="full-board-title" className="type-h3 text-primary">
+                    Full board
+                  </h2>
+                  <span className="type-small text-muted">
+                    Every {scopeLabel} with at least one solve
+                  </span>
+                </div>
+                {board.isPending || entries.length > 0 ? (
+                  <div className="overflow-hidden rounded-lg border border-hairline bg-surface px-4 py-2 shadow-card sm:px-6">
+                    {table}
+                  </div>
+                ) : (
+                  table
+                )}
+              </section>
+            </Reveal>
           </>
         )}
       </div>

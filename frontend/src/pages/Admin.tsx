@@ -48,18 +48,18 @@ export default function Admin() {
             ))}
           </div>
 
-          <ul className="hidden border-t border-hairline lg:block">
+          <ul className="hidden gap-1 lg:flex lg:flex-col">
             {ADMIN_LINKS.map((link) => (
-              <li key={link.to} className="border-b border-hairline">
+              <li key={link.to}>
                 <NavLink
                   to={link.to}
                   end={link.end}
                   className={({ isActive }) =>
                     cn(
-                      'flex min-h-11 items-center border-l-2 px-3 type-small font-medium transition-colors duration-instant',
+                      'flex min-h-11 items-center rounded-md px-3 type-small font-medium transition-colors duration-instant',
                       isActive
-                        ? 'border-l-accent bg-accent-faint text-primary'
-                        : 'border-l-transparent text-secondary hover:bg-elevated hover:text-primary',
+                        ? 'band-tint bg-accent-faint text-accent-strong'
+                        : 'text-secondary hover:bg-elevated hover:text-primary',
                     )
                   }
                 >

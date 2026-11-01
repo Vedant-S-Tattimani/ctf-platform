@@ -8,7 +8,7 @@ import { buttonVariants } from '@/components/ui/Button';
 import { useCurrentEvent } from '@/features/events/queries';
 import { useAuth } from '@/hooks/useAuth';
 import { usePrefersCoarsePointer, usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
-import { formatPoints } from '@/lib/format';
+import { formatCount } from '@/lib/format';
 import { ScoreSpine } from './ScoreSpine';
 
 const ParticleField = lazy(() => import('@/components/reactbits/ParticleField'));
@@ -107,9 +107,8 @@ export function Hero() {
             ) : (
               <p className="type-small text-muted">
                 Built for teams
-                {entries.length > 0 &&
-                  ` · ${entries.length} ${entries.length === 1 ? 'team' : 'teams'} ranked`}
-                {solves > 0 && ` · ${formatPoints(solves)} flags captured`}
+                {entries.length > 0 && ` · ${formatCount(entries.length, 'team')} ranked`}
+                {solves > 0 && ` · ${formatCount(solves, 'flag')} captured`}
               </p>
             )}
           </div>

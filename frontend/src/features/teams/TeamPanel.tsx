@@ -1,6 +1,7 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { scoreboardApi } from '@/api/scoreboard';
 import { teamsApi } from '@/api/teams';
 import type { Team } from '@/api/types';
 import { Avatar } from '@/components/ui/Avatar';
@@ -8,15 +9,24 @@ import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { CopyButton } from '@/components/ui/CopyButton';
 import { Input } from '@/components/ui/Input';
+import { Progress } from '@/components/ui/Progress';
 import { useAuth } from '@/hooks/useAuth';
 import { errorMessage, fieldErrorsFromApi } from '@/lib/errors';
-import { formatDateUTC } from '@/lib/format';
+import { formatDateUTC, formatCount, formatPoints } from '@/lib/format';
 import { toast } from '@/store/toast';
 
 export function TeamPanel({ team }: { team: Team }) {
   const { user, refresh } = useAuth();
   const queryClient = useQueryClient();
   const isOwner = team.ownerId === user?.id;
+
+  // Same cached query the scoreboard and team pages use, so the standing shown
+  // here can never disagree with the board.
+  const board = useQuery({
+    queryKey: ['scoreboard', 'list', 'teams'],
+    queryFn: ({ signal }) => scoreboardApi.list({ scope: 'teams', limit: 100 }, signal),
+  });
+  const standing = board.data?.entries.find((entry) => entry.id === team.id) ?? null;
 
   const [name, setName] = useState(team.name);
   const [description, setDescription] = useState(team.description ?? '');
@@ -97,9 +107,9 @@ export function TeamPanel({ team }: { team: Team }) {
   });
 
   return (
-    <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_19rem] lg:gap-0">
-      <div className="flex flex-col gap-8 lg:pr-10">
-        <header className="flex items-start gap-4 sm:gap-5">
+    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_19rem] lg:items-start lg:gap-8">
+      <div className="flex flex-col gap-6">
+        <header className="flex flex-wrap items-start gap-4 rounded-lg border border-hairline bg-surface p-6 shadow-card sm:gap-5 sm:p-8">
           <Avatar name={team.name} src={team.avatarUrl} size="lg" />
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
@@ -109,31 +119,56 @@ export function TeamPanel({ team }: { team: Team }) {
             <p className="mt-1 max-w-measure text-secondary">
               {team.description ?? 'No description yet. The owner can add one below.'}
             </p>
-            <p className="mt-2 type-small text-muted">
-              {team.memberCount} of {team.maxSize} seats taken
-            </p>
           </div>
+          {standing && (
+            <dl className="ml-auto flex shrink-0 items-center gap-8">
+              <div className="flex flex-col gap-1">
+                <dt className="type-small text-muted">Rank</dt>
+                <dd className="nums font-mono text-h3 text-accent-strong">#{standing.rank}</dd>
+              </div>
+              <div className="flex flex-col gap-1">
+                <dt className="type-small text-muted">Points</dt>
+                <dd className="nums font-mono text-h3 text-primary">
+                  {formatPoints(standing.points)}
+                </dd>
+              </div>
+            </dl>
+          )}
         </header>
 
-        <section aria-labelledby="roster-title" className="border-t border-hairline pt-6">
+        <section
+          aria-labelledby="roster-title"
+          className="rounded-lg border border-hairline bg-surface p-6 shadow-card sm:p-8"
+        >
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <h3 id="roster-title" className="type-h3 text-primary">
               Roster
             </h3>
-            <span className="type-small text-muted">
-              {team.memberCount}/{team.maxSize} seats
-            </span>
+            {isOwner && team.memberCount > 1 && (
+              <span className="type-small text-muted">
+                Owner controls are on each teammate row.
+              </span>
+            )}
           </div>
-          {isOwner && team.memberCount > 1 && (
-            <p className="mt-1 type-small text-muted">
-              As owner you can remove members or hand over ownership.
-            </p>
-          )}
-          <ul className="mt-2">
+          <Progress
+            className="mt-4"
+            label="Seats"
+            value={team.memberCount}
+            max={team.maxSize}
+            hint={
+              team.memberCount >= team.maxSize
+                ? 'This team is full.'
+                : `${formatCount(team.maxSize - team.memberCount, 'seat')} left — share the invite code.`
+            }
+          />
+          <ul className="mt-4 flex flex-col">
             {team.members.map((member) => {
               const action = memberAction?.userId === member.id ? memberAction.kind : null;
               return (
-                <li key={member.id} className="border-b border-hairline py-3 last:border-b-0">
+                <li
+                  key={member.id}
+                  className="-mx-3 rounded-md border-b border-hairline px-3 py-3 last:border-b-0"
+                >
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
                     <Avatar name={member.username} src={member.avatarUrl} size="sm" />
                     <Link
@@ -199,7 +234,10 @@ export function TeamPanel({ team }: { team: Team }) {
         </section>
 
         {isOwner && (
-          <section aria-labelledby="team-settings-title" className="border-t border-hairline pt-6">
+          <section
+            aria-labelledby="team-settings-title"
+            className="rounded-lg border border-hairline bg-surface p-6 shadow-card sm:p-8"
+          >
             <h3 id="team-settings-title" className="type-h3 text-primary">
               Team settings
             </h3>
@@ -238,9 +276,12 @@ export function TeamPanel({ team }: { team: Team }) {
         )}
       </div>
 
-      <aside className="flex flex-col gap-8 lg:border-l lg:border-hairline lg:pl-8">
-        <section aria-labelledby="invite-title">
-          <h3 id="invite-title" className="type-label text-muted">
+      <aside className="flex flex-col gap-6">
+        <section
+          aria-labelledby="invite-title"
+          className="rounded-lg border border-accent bg-accent-faint p-6 shadow-soft"
+        >
+          <h3 id="invite-title" className="type-label text-accent-strong">
             Invite code
           </h3>
           <p className="mt-2 type-small text-secondary">
@@ -249,7 +290,7 @@ export function TeamPanel({ team }: { team: Team }) {
           {team.inviteCode ? (
             <>
               <div className="mt-3 flex flex-wrap items-center gap-3">
-                <code className="rounded-sm border border-subtle bg-elevated px-3 py-1.5 font-mono text-h3 tracking-[0.25em] text-primary">
+                <code className="rounded-md border border-hairline bg-surface px-3 py-1.5 font-mono text-h3 tracking-[0.25em] text-primary">
                   {team.inviteCode}
                 </code>
                 <CopyButton value={team.inviteCode} label="Copy code" copiedLabel="Copied" />
@@ -286,26 +327,26 @@ export function TeamPanel({ team }: { team: Team }) {
           )}
         </section>
 
-        <section aria-labelledby="team-details-title" className="border-t border-hairline pt-6">
+        <section
+          aria-labelledby="team-details-title"
+          className="rounded-lg border border-hairline bg-surface p-6 shadow-card"
+        >
           <h3 id="team-details-title" className="type-label text-muted">
             Details
           </h3>
           <dl className="mt-2 flex flex-col type-small">
-            <div className="flex items-center justify-between gap-4 border-b border-hairline py-2.5">
+            <div className="flex items-center justify-between gap-4 py-2.5">
               <dt className="text-muted">Created</dt>
               <dd className="nums text-primary">{formatDateUTC(team.createdAt)}</dd>
-            </div>
-            <div className="flex items-center justify-between gap-4 py-2.5">
-              <dt className="text-muted">Seats</dt>
-              <dd className="nums text-primary">
-                {team.memberCount}/{team.maxSize}
-              </dd>
             </div>
           </dl>
         </section>
 
-        <section aria-labelledby="leave-team-title" className="border-t border-hairline pt-6">
-          <h3 id="leave-team-title" className="type-label text-muted">
+        <section
+          aria-labelledby="leave-team-title"
+          className="rounded-lg border border-danger bg-surface p-6 shadow-card"
+        >
+          <h3 id="leave-team-title" className="type-label text-danger">
             Leave team
           </h3>
           <p className="mt-2 type-small text-secondary">

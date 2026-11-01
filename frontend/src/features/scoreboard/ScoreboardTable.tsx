@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/Badge';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { buttonVariants } from '@/components/ui/Button';
 import { Skeleton } from '@/components/ui/Skeleton';
-import { formatCompactUTC, formatPoints } from '@/lib/format';
+import { formatCompactUTC, formatCount, formatPoints } from '@/lib/format';
 import { cn } from '@/lib/utils';
 
 interface ScoreboardTableProps {
@@ -85,7 +85,7 @@ export function ScoreboardTable({ entries, scope, highlightId, isPending }: Scor
                 key={entry.id}
                 className={cn(
                   'border-t border-hairline',
-                  highlighted && 'bg-accent-faint',
+                  highlighted && 'band-tint bg-accent-faint',
                 )}
               >
                 <td className="py-3 pr-4 text-right">
@@ -134,7 +134,7 @@ export function ScoreboardTable({ entries, scope, highlightId, isPending }: Scor
             key={entry.id}
             className={cn(
               'border-b border-hairline last:border-b-0',
-              isHighlighted(entry.id) && 'bg-accent-faint',
+              isHighlighted(entry.id) && 'band-tint bg-accent-faint',
             )}
           >
             <Link to={href(entry.id)} className="flex items-center gap-3 py-3">
@@ -153,10 +153,10 @@ export function ScoreboardTable({ entries, scope, highlightId, isPending }: Scor
                   {isHighlighted(entry.id) && <Badge tone="accent">You</Badge>}
                 </span>
                 <span className="type-small text-muted">
-                  {entry.solveCount} {entry.solveCount === 1 ? 'solve' : 'solves'}
+                  {formatCount(entry.solveCount, 'solve')}
                   {scope === 'teams' &&
                     entry.memberCount !== null &&
-                    ` · ${entry.memberCount} ${entry.memberCount === 1 ? 'member' : 'members'}`}
+                    ` · ${formatCount(entry.memberCount, 'member')}`}
                 </span>
               </span>
               <span className="shrink-0 text-right">

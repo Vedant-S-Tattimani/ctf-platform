@@ -5,11 +5,12 @@ import { Button, buttonVariants } from '@/components/ui/Button';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { Input } from '@/components/ui/Input';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { Reveal } from '@/components/ui/Reveal';
 import { Select } from '@/components/ui/Select';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Textarea } from '@/components/ui/Textarea';
 import { errorMessage, fieldErrorsFromApi } from '@/lib/errors';
-import { formatBytes, formatDateTimeUTC, formatPoints } from '@/lib/format';
+import { formatBytes, formatCount, formatDateTimeUTC, formatPoints } from '@/lib/format';
 import { toast } from '@/store/toast';
 import {
   useAdminCategories,
@@ -77,7 +78,7 @@ function EditorSection({
   children: React.ReactNode;
 }) {
   return (
-    <section className="flex flex-col gap-4 border-t border-hairline pt-6">
+    <section className="flex flex-col gap-4 rounded-lg border border-hairline bg-surface p-6 shadow-card sm:p-8">
       <div className="flex flex-col gap-1">
         <h2 className="type-h3 text-primary">{title}</h2>
         {description && <p className="max-w-measure type-small text-secondary">{description}</p>}
@@ -369,7 +370,7 @@ export function AdminChallengeEditor({ mode }: AdminChallengeEditorProps) {
               </Badge>
               <Badge tone="neutral">{challenge.category.name}</Badge>
               <span className="nums">{formatPoints(challenge.points)} pts</span>
-              <span className="nums">{challenge._count.solves} solves</span>
+              <span className="nums">{formatCount(challenge._count.solves, 'solve')}</span>
             </>
           ) : undefined
         }
@@ -386,15 +387,15 @@ export function AdminChallengeEditor({ mode }: AdminChallengeEditorProps) {
       />
 
       {loadingDetail ? (
-        <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-12">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start lg:gap-8">
           <div className="flex flex-col gap-4" aria-busy="true">
-            <Skeleton className="h-11 w-full" />
-            <Skeleton className="h-28 w-full" />
-            <Skeleton className="h-11 w-full" />
-            <Skeleton className="h-48 w-full" />
+            <Skeleton className="h-11 w-full rounded-md" />
+            <Skeleton className="h-28 w-full rounded-md" />
+            <Skeleton className="h-11 w-full rounded-md" />
+            <Skeleton className="h-48 w-full rounded-md" />
             <span className="sr-only">Loading the challenge…</span>
           </div>
-          <Skeleton className="h-64 w-full rounded-md" />
+          <Skeleton className="h-64 w-full rounded-lg" />
         </div>
       ) : editing && detail.isError ? (
         <ErrorState
@@ -403,8 +404,8 @@ export function AdminChallengeEditor({ mode }: AdminChallengeEditorProps) {
           onRetry={() => void detail.refetch()}
         />
       ) : (
-        <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-0">
-          <div className="flex min-w-0 flex-col gap-8 lg:pr-10">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start lg:gap-8">
+          <Reveal stagger className="flex min-w-0 flex-col gap-6">
             <EditorSection title="Basics" description="The brief players read before they start.">
               <Input
                 label="Title"
@@ -496,16 +497,16 @@ export function AdminChallengeEditor({ mode }: AdminChallengeEditorProps) {
                   title="Flags"
                   description="Values are salted and hashed on write. Only the label and points stay readable."
                 >
-                  <ul className="border-t border-hairline">
+                  <ul className="flex flex-col gap-1 rounded-md border border-hairline bg-canvas p-2">
                     {challenge.flags.length === 0 && (
-                      <li className="border-b border-hairline py-3 type-small text-muted">
+                      <li className="px-3 py-2.5 type-small text-muted">
                         No flags yet — add the first one below.
                       </li>
                     )}
                     {challenge.flags.map((flag, index) => (
                       <li
                         key={flag.id}
-                        className="flex items-center justify-between gap-3 border-b border-hairline py-3"
+                        className="flex items-center justify-between gap-3 rounded-md px-3 py-2.5 transition-colors duration-instant hover:bg-elevated"
                       >
                         <span className="min-w-0">
                           <span className="block truncate text-primary">
@@ -560,16 +561,16 @@ export function AdminChallengeEditor({ mode }: AdminChallengeEditorProps) {
                 </EditorSection>
 
                 <EditorSection title="Hints" description="Optional nudges players can unlock.">
-                  <ul className="border-t border-hairline">
+                  <ul className="flex flex-col gap-1 rounded-md border border-hairline bg-canvas p-2">
                     {challenge.hints.length === 0 && (
-                      <li className="border-b border-hairline py-3 type-small text-muted">
+                      <li className="px-3 py-2.5 type-small text-muted">
                         No hints yet.
                       </li>
                     )}
                     {challenge.hints.map((hint) => (
                       <li
                         key={hint.id}
-                        className="flex items-start justify-between gap-3 border-b border-hairline py-3"
+                        className="flex items-start justify-between gap-3 rounded-md px-3 py-2.5 transition-colors duration-instant hover:bg-elevated"
                       >
                         <span className="min-w-0">
                           <span className="block text-primary">{hint.content}</span>
@@ -618,16 +619,16 @@ export function AdminChallengeEditor({ mode }: AdminChallengeEditorProps) {
                 </EditorSection>
 
                 <EditorSection title="Files" description="Handouts, archives or links attached to the brief.">
-                  <ul className="border-t border-hairline">
+                  <ul className="flex flex-col gap-1 rounded-md border border-hairline bg-canvas p-2">
                     {challenge.files.length === 0 && (
-                      <li className="border-b border-hairline py-3 type-small text-muted">
+                      <li className="px-3 py-2.5 type-small text-muted">
                         No files attached.
                       </li>
                     )}
                     {challenge.files.map((file) => (
                       <li
                         key={file.id}
-                        className="flex flex-wrap items-center justify-between gap-3 border-b border-hairline py-3"
+                        className="flex flex-wrap items-center justify-between gap-3 rounded-md px-3 py-2.5 transition-colors duration-instant hover:bg-elevated"
                       >
                         <span className="min-w-0">
                           <span className="block truncate font-mono text-primary">{file.name}</span>
@@ -907,16 +908,19 @@ export function AdminChallengeEditor({ mode }: AdminChallengeEditorProps) {
                 {editing ? 'Save changes' : 'Create challenge'}
               </Button>
             </div>
-          </div>
+          </Reveal>
 
-          <aside className="flex flex-col gap-8 lg:border-l lg:border-hairline lg:pl-8">
+          <Reveal stagger className="flex flex-col gap-6">
             {editing && challenge ? (
               <>
-                <section aria-labelledby="editor-status">
+                <section
+                  aria-labelledby="editor-status"
+                  className="rounded-lg border border-hairline bg-surface p-6 shadow-card"
+                >
                   <h2 id="editor-status" className="type-label text-muted">
                     Status
                   </h2>
-                  <dl className="mt-3 divide-y divide-hairline border-y border-hairline type-small">
+                  <dl className="mt-3 divide-y divide-hairline type-small">
                     <div className="flex items-baseline justify-between gap-4 py-2.5">
                       <dt className="text-muted">Visibility</dt>
                       <dd className="text-secondary">
@@ -954,7 +958,10 @@ export function AdminChallengeEditor({ mode }: AdminChallengeEditorProps) {
                 </section>
 
                 {challenge.scoring && (
-                  <section aria-labelledby="editor-scoring">
+                  <section
+                    aria-labelledby="editor-scoring"
+                    className="rounded-lg border border-hairline bg-surface p-6 shadow-card"
+                  >
                     <h2 id="editor-scoring" className="type-label text-muted">
                       Dynamic scoring
                     </h2>
@@ -963,15 +970,13 @@ export function AdminChallengeEditor({ mode }: AdminChallengeEditorProps) {
                       of {formatPoints(challenge.scoring.minimumPoints)} at{' '}
                       {challenge.scoring.decayThreshold} solves.
                     </p>
-                    <dl className="mt-3 divide-y divide-hairline border-y border-hairline type-small">
+                    <dl className="mt-3 divide-y divide-hairline type-small">
                       {challenge.scoring.samples.map((sample) => (
                         <div
                           key={sample.solves}
                           className="flex items-baseline justify-between gap-4 py-2"
                         >
-                          <dt className="text-muted">
-                            After {sample.solves} {sample.solves === 1 ? 'solve' : 'solves'}
-                          </dt>
+                          <dt className="text-muted">After {formatCount(sample.solves, 'solve')}</dt>
                           <dd className="nums text-accent-strong">{formatPoints(sample.points)}</dd>
                         </div>
                       ))}
@@ -979,7 +984,10 @@ export function AdminChallengeEditor({ mode }: AdminChallengeEditorProps) {
                   </section>
                 )}
 
-                <section aria-labelledby="editor-danger">
+                <section
+                  aria-labelledby="editor-danger"
+                  className="band-tint rounded-lg border border-danger bg-danger-faint p-6 shadow-card"
+                >
                   <h2 id="editor-danger" className="type-label text-muted">
                     Danger zone
                   </h2>
@@ -1022,11 +1030,14 @@ export function AdminChallengeEditor({ mode }: AdminChallengeEditorProps) {
                 </section>
               </>
             ) : (
-              <section aria-labelledby="editor-publishing">
+              <section
+                aria-labelledby="editor-publishing"
+                className="rounded-lg border border-hairline bg-surface p-6 shadow-card"
+              >
                 <h2 id="editor-publishing" className="type-label text-muted">
                   Before you publish
                 </h2>
-                <ul className="mt-3 divide-y divide-hairline border-y border-hairline type-small text-secondary">
+                <ul className="mt-3 divide-y divide-hairline type-small text-secondary">
                   <li className="py-3">
                     Flags are hashed with a per-flag salt. Values never leave the server in
                     plaintext.
@@ -1038,7 +1049,7 @@ export function AdminChallengeEditor({ mode }: AdminChallengeEditorProps) {
                 </ul>
               </section>
             )}
-          </aside>
+          </Reveal>
         </div>
       )}
     </form>

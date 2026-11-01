@@ -42,6 +42,11 @@ export function formatPoints(points: number): string {
   return points.toLocaleString('en-US');
 }
 
+/** A count with its noun, so "1 flag" never reads as "1 flags". */
+export function formatCount(count: number, singular: string): string {
+  return `${count.toLocaleString('en-US')} ${count === 1 ? singular : `${singular}s`}`;
+}
+
 export function formatDate(iso: string): string {
   return dateFormatter.format(new Date(iso));
 }

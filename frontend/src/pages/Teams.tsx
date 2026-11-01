@@ -6,11 +6,14 @@ import type { ScoreboardEntry } from '@/api/types';
 import { PageShell } from '@/components/layout/PageShell';
 import { Avatar } from '@/components/ui/Avatar';
 import { buttonVariants } from '@/components/ui/Button';
+import { ErrorState } from '@/components/ui/ErrorState';
+import { Reveal } from '@/components/ui/Reveal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { TeamOnboarding } from '@/features/teams/TeamOnboarding';
 import { TeamPanel } from '@/features/teams/TeamPanel';
 import { useAuth } from '@/hooks/useAuth';
-import { formatPoints } from '@/lib/format';
+import { errorMessage } from '@/lib/errors';
+import { formatCount, formatPoints } from '@/lib/format';
 import { cn } from '@/lib/utils';
 
 export default function Teams() {
@@ -23,8 +26,8 @@ export default function Teams() {
   });
 
   const top = useQuery({
-    queryKey: ['scoreboard', 'teams', 'discover'],
-    queryFn: ({ signal }) => scoreboardApi.list({ scope: 'teams', limit: 10 }, signal),
+    queryKey: ['scoreboard', 'list', 'teams'],
+    queryFn: ({ signal }) => scoreboardApi.list({ scope: 'teams', limit: 100 }, signal),
   });
 
   return (
@@ -36,6 +39,12 @@ export default function Teams() {
               <Skeleton className="h-24" />
               <Skeleton className="h-44" />
             </div>
+          ) : team.isError ? (
+            <ErrorState
+              title="Could not load your team"
+              description={errorMessage(team.error)}
+              onRetry={() => void team.refetch()}
+            />
           ) : team.data?.team ? (
             <TeamPanel team={team.data.team} />
           ) : (
@@ -48,8 +57,11 @@ export default function Teams() {
         )}
 
         <TopTeams
-          entries={top.data?.entries ?? []}
+          entries={(top.data?.entries ?? []).slice(0, 10)}
           isPending={top.isPending}
+          failed={top.isError}
+          failure={errorMessage(top.error)}
+          onRetry={() => void top.refetch()}
           highlightId={user?.teamId ?? null}
         />
       </div>
@@ -59,7 +71,10 @@ export default function Teams() {
 
 function GuestInvite() {
   return (
-    <section aria-labelledby="bring-crew-title" className="border-y border-hairline py-8 sm:py-10">
+    <section
+      aria-labelledby="bring-crew-title"
+      className="rounded-lg border border-hairline bg-surface p-6 shadow-card sm:p-8"
+    >
       <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
         <div>
           <h2 id="bring-crew-title" className="type-h2 text-primary">
@@ -86,10 +101,16 @@ function GuestInvite() {
 function TopTeams({
   entries,
   isPending,
+  failed,
+  failure,
+  onRetry,
   highlightId,
 }: {
   entries: ScoreboardEntry[];
   isPending: boolean;
+  failed: boolean;
+  failure: string;
+  onRetry: () => void;
   highlightId: string | null;
 }) {
   return (
@@ -115,23 +136,33 @@ function TopTeams({
             </div>
           ))}
         </div>
+      ) : failed ? (
+        <ErrorState
+          className="mt-4"
+          title="The team ranking did not load"
+          description={failure}
+          onRetry={onRetry}
+        />
       ) : entries.length === 0 ? (
         <p className="mt-4 border-t border-hairline pt-4 text-secondary">
           No team has put a flag on the board yet. The first solve starts the ranking.
         </p>
       ) : (
-        <ol className="mt-2">
+        <Reveal stagger as="ol" role="list" className="stagger mt-4 flex flex-col gap-1 rounded-lg border border-hairline bg-surface p-2 shadow-card sm:p-3">
           {entries.map((entry) => {
             const highlighted = entry.id === highlightId;
             return (
               <li
                 key={entry.id}
-                className={cn(
-                  'border-b border-hairline',
-                  highlighted && 'bg-accent-faint',
-                )}
+                className={cn('rounded-lg', highlighted && 'band-tint bg-accent-faint')}
               >
-                <Link to={`/teams/${entry.id}`} className="group flex items-center gap-3 py-3">
+                <Link
+                  to={`/teams/${entry.id}`}
+                  className={cn(
+                    'group flex items-center gap-3 rounded-lg px-3 py-3 transition-colors duration-instant hover:bg-elevated',
+                    highlighted && 'hover:bg-transparent',
+                  )}
+                >
                   <span className="nums w-7 shrink-0 text-center font-mono type-small text-muted">
                     {String(entry.rank).padStart(2, '0')}
                   </span>
@@ -141,9 +172,8 @@ function TopTeams({
                       {entry.name}
                     </span>
                     <span className="type-small text-muted">
-                      {entry.memberCount ?? 0}{' '}
-                      {(entry.memberCount ?? 0) === 1 ? 'member' : 'members'} · {entry.solveCount}{' '}
-                      {entry.solveCount === 1 ? 'solve' : 'solves'}
+                      {formatCount(entry.memberCount ?? 0, 'member')} ·{' '}
+                      {formatCount(entry.solveCount, 'solve')}
                     </span>
                   </span>
                   <span className="nums shrink-0 font-mono font-semibold text-primary">
@@ -153,7 +183,7 @@ function TopTeams({
               </li>
             );
           })}
-        </ol>
+        </Reveal>
       )}
     </section>
   );

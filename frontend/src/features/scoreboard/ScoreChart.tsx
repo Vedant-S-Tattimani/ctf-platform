@@ -16,6 +16,9 @@ const HEIGHT = 220;
 const PAD_X = 6;
 const PAD_Y = 10;
 
+/** Matches the podium card so the scoreboard reads as a stack of panels. */
+const chartShell = 'rounded-lg border border-hairline bg-surface p-6 shadow-card sm:p-8';
+
 export function ScoreChart({
   series,
   isPending,
@@ -25,7 +28,7 @@ export function ScoreChart({
 }) {
   if (isPending) {
     return (
-      <section aria-labelledby="points-chart-title" className="border-b border-hairline pb-8" aria-busy="true">
+      <section aria-labelledby="points-chart-title" className={chartShell} aria-busy="true">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <div>
             <h2 id="points-chart-title" className="type-h3 text-primary">
@@ -61,7 +64,7 @@ export function ScoreChart({
 
   if (prepared.length === 0) {
     return (
-      <section aria-labelledby="points-chart-title" className="border-b border-hairline pb-8">
+      <section aria-labelledby="points-chart-title" className={chartShell}>
         <h2 id="points-chart-title" className="type-h3 text-primary">
           Points over time
         </h2>
@@ -88,7 +91,7 @@ export function ScoreChart({
   const y = (value: number) => PAD_Y + (1 - value / maxY) * (HEIGHT - PAD_Y * 2);
 
   return (
-    <section aria-labelledby="points-chart-title" className="border-b border-hairline pb-8">
+    <section aria-labelledby="points-chart-title" className={chartShell}>
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <div>
           <h2 id="points-chart-title" className="type-h3 text-primary">

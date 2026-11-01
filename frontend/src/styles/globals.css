@@ -141,6 +141,13 @@
   color: var(--paper-25);
 }
 
+/* A faint tint lifts the surface it sits on, which costs the muted role about
+   half a point of contrast. Inside a tinted card or highlighted row the muted
+   role resolves one step darker so small labels keep 4.5:1 on both themes. */
+.band-tint {
+  --text-muted: var(--text-secondary);
+}
+
 /* Scroll reveals. The class pair is driven by <Reveal> (IntersectionObserver);
    where the browser supports a view() timeline we let CSS do the work instead. */
 @layer utilities {

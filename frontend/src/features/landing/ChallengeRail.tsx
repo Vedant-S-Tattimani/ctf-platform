@@ -4,12 +4,12 @@ import { challengesApi } from '@/api/challenges';
 import { Carousel } from '@/components/ui/Carousel';
 import { Reveal } from '@/components/ui/Reveal';
 import { Badge } from '@/components/ui/Badge';
-import { difficultyLabel, difficultyTone, formatPoints } from '@/lib/format';
+import { difficultyLabel, difficultyTone, formatCount, formatPoints } from '@/lib/format';
 import { Icon } from '@/lib/icons';
 
 /** The rail the landing uses instead of a single spotlight: hardest first. */
 export function ChallengeRail() {
-  const { data, isPending } = useQuery({
+  const { data, isPending, isError } = useQuery({
     queryKey: ['challenges', 'list'],
     queryFn: ({ signal }) => challengesApi.list({}, signal),
     staleTime: 30_000,
@@ -18,6 +18,10 @@ export function ChallengeRail() {
   const challenges = [...(data?.challenges ?? [])]
     .sort((a, b) => b.currentPoints - a.currentPoints)
     .slice(0, 6);
+
+  // A decorative band: a failed request reads as an empty board, which is worse
+  // than not showing the section at all.
+  if (isError) return null;
 
   return (
     <section className="mx-auto max-w-container px-4 py-16 sm:px-6 sm:py-band" aria-labelledby="rail-title">
@@ -66,8 +70,7 @@ export function ChallengeRail() {
               <h3 className="type-h3 text-primary">{challenge.title}</h3>
 
               <p className="type-small text-secondary">
-                {challenge.flagsSolved} of {challenge.flagsTotal}{' '}
-                {challenge.flagsTotal === 1 ? 'flag' : 'flags'} captured
+                {challenge.flagsSolved} of {formatCount(challenge.flagsTotal, 'flag')} captured
                 {challenge.solvedByMe && ' · you solved this'}
               </p>
 

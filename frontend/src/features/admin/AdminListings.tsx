@@ -5,10 +5,11 @@ import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { Reveal } from '@/components/ui/Reveal';
 import { Segmented } from '@/components/ui/Segmented';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { errorMessage } from '@/lib/errors';
-import { formatCompactUTC, formatDateUTC, formatDateTimeUTC } from '@/lib/format';
+import { formatCompactUTC, formatCount, formatDateUTC, formatDateTimeUTC } from '@/lib/format';
 import { useAdminSubmissions, useAdminTeams, useAdminUsers } from './queries';
 
 type ListingTab = 'users' | 'teams' | 'submissions';
@@ -78,7 +79,7 @@ export function AdminListings() {
           <span className="sr-only">Loading records…</span>
         </div>
       ) : total === 0 ? (
-        <div className="border-y border-hairline py-12 text-center">
+        <div className="rounded-lg border border-hairline bg-surface p-6 text-center shadow-card sm:p-8">
           <p className="type-h3 text-primary">No records yet</p>
           <p className="mx-auto mt-2 max-w-measure text-secondary">
             {tab === 'submissions'
@@ -86,12 +87,16 @@ export function AdminListings() {
               : 'Records appear here as players and teams join the competition.'}
           </p>
         </div>
-      ) : tab === 'users' ? (
-        <UsersTable rows={users.data?.users ?? []} />
-      ) : tab === 'teams' ? (
-        <TeamsTable rows={teams.data?.teams ?? []} />
       ) : (
-        <SubmissionsTable rows={submissions.data?.submissions ?? []} />
+        <Reveal key={tab}>
+          {tab === 'users' ? (
+            <UsersTable rows={users.data?.users ?? []} />
+          ) : tab === 'teams' ? (
+            <TeamsTable rows={teams.data?.teams ?? []} />
+          ) : (
+            <SubmissionsTable rows={submissions.data?.submissions ?? []} />
+          )}
+        </Reveal>
       )}
 
       <div className="flex items-center justify-between gap-3 type-small text-muted">
@@ -124,9 +129,9 @@ export function AdminListings() {
 function UsersTable({ rows }: { rows: AdminUserRow[] }) {
   return (
     <>
-      <ul className="border-t border-hairline md:hidden">
+      <ul className="divide-y divide-hairline overflow-hidden rounded-lg border border-hairline bg-surface px-3 shadow-card sm:px-4 md:hidden">
         {rows.map((row) => (
-          <li key={row.id} className="flex flex-col gap-1.5 border-b border-hairline py-3">
+          <li key={row.id} className="-mx-3 flex flex-col gap-1.5 rounded-md px-3 py-3 sm:-mx-4 sm:px-4">
             <div className="flex items-start justify-between gap-3">
               <Link
                 to={`/users/${row.id}`}
@@ -138,61 +143,63 @@ function UsersTable({ rows }: { rows: AdminUserRow[] }) {
             </div>
             <p className="truncate type-small text-secondary">{row.email}</p>
             <p className="type-small text-muted">
-              {row.team?.name ?? 'No team'} · {row._count.solves} solves ·{' '}
+              {row.team?.name ?? 'No team'} · {formatCount(row._count.solves, 'solve')} ·{' '}
               {formatCompactUTC(row.createdAt)}
             </p>
           </li>
         ))}
       </ul>
 
-      <div className="hidden overflow-x-auto md:block">
-        <table className="w-full min-w-[44rem] border-collapse text-left">
-          <thead>
-            <tr className="border-b border-hairline type-label text-muted">
-              <th scope="col" className="py-2.5 pr-4 font-medium">
-                Player
-              </th>
-              <th scope="col" className="px-4 py-2.5 font-medium">
-                Email
-              </th>
-              <th scope="col" className="px-4 py-2.5 font-medium">
-                Role
-              </th>
-              <th scope="col" className="px-4 py-2.5 font-medium">
-                Team
-              </th>
-              <th scope="col" className="px-4 py-2.5 text-right font-medium">
-                Solves
-              </th>
-              <th scope="col" className="py-2.5 pl-4 text-right font-medium">
-                Joined
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row) => (
-              <tr key={row.id} className="border-b border-hairline hover:bg-elevated">
-                <td className="py-3 pr-4">
-                  <Link
-                    to={`/users/${row.id}`}
-                    className="font-medium text-primary transition-colors duration-instant hover:text-accent-strong"
-                  >
-                    {row.username}
-                  </Link>
-                </td>
-                <td className="px-4 py-3 type-small text-secondary">{row.email}</td>
-                <td className="px-4 py-3">
-                  <Badge tone={row.role === 'ADMIN' ? 'accent' : 'neutral'}>{row.role}</Badge>
-                </td>
-                <td className="px-4 py-3 type-small text-secondary">{row.team?.name ?? '—'}</td>
-                <td className="nums px-4 py-3 text-right text-secondary">{row._count.solves}</td>
-                <td className="nums py-3 pl-4 text-right type-small text-muted">
-                  {formatDateUTC(row.createdAt)}
-                </td>
+      <div className="hidden overflow-hidden rounded-lg border border-hairline bg-surface px-4 py-2 shadow-card md:block">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[44rem] border-collapse text-left">
+            <thead>
+              <tr className="border-b border-hairline type-label text-muted">
+                <th scope="col" className="py-2.5 pr-4 font-medium">
+                  Player
+                </th>
+                <th scope="col" className="px-4 py-2.5 font-medium">
+                  Email
+                </th>
+                <th scope="col" className="px-4 py-2.5 font-medium">
+                  Role
+                </th>
+                <th scope="col" className="px-4 py-2.5 font-medium">
+                  Team
+                </th>
+                <th scope="col" className="px-4 py-2.5 text-right font-medium">
+                  Solves
+                </th>
+                <th scope="col" className="py-2.5 pl-4 text-right font-medium">
+                  Joined
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {rows.map((row) => (
+                <tr key={row.id} className="border-b border-hairline last:border-b-0 hover:bg-elevated">
+                  <td className="py-3 pr-4">
+                    <Link
+                      to={`/users/${row.id}`}
+                      className="font-medium text-primary transition-colors duration-instant hover:text-accent-strong"
+                    >
+                      {row.username}
+                    </Link>
+                  </td>
+                  <td className="px-4 py-3 type-small text-secondary">{row.email}</td>
+                  <td className="px-4 py-3">
+                    <Badge tone={row.role === 'ADMIN' ? 'accent' : 'neutral'}>{row.role}</Badge>
+                  </td>
+                  <td className="px-4 py-3 type-small text-secondary">{row.team?.name ?? '—'}</td>
+                  <td className="nums px-4 py-3 text-right text-secondary">{row._count.solves}</td>
+                  <td className="nums py-3 pl-4 text-right type-small text-muted">
+                    {formatDateUTC(row.createdAt)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </>
   );
@@ -201,9 +208,9 @@ function UsersTable({ rows }: { rows: AdminUserRow[] }) {
 function TeamsTable({ rows }: { rows: AdminTeamRow[] }) {
   return (
     <>
-      <ul className="border-t border-hairline md:hidden">
+      <ul className="divide-y divide-hairline overflow-hidden rounded-lg border border-hairline bg-surface px-3 shadow-card sm:px-4 md:hidden">
         {rows.map((row) => (
-          <li key={row.id} className="flex flex-col gap-1.5 border-b border-hairline py-3">
+          <li key={row.id} className="-mx-3 flex flex-col gap-1.5 rounded-md px-3 py-3 sm:-mx-4 sm:px-4">
             <Link
               to={`/teams/${row.id}`}
               className="truncate font-medium text-primary transition-colors duration-instant hover:text-accent-strong"
@@ -212,57 +219,59 @@ function TeamsTable({ rows }: { rows: AdminTeamRow[] }) {
             </Link>
             <p className="type-small text-secondary">Owner {row.owner.username}</p>
             <p className="type-small text-muted">
-              {row._count.members}/{row.maxSize} members · {row._count.solves} solves ·{' '}
-              {formatCompactUTC(row.createdAt)}
+              {row._count.members}/{row.maxSize} members ·{' '}
+              {formatCount(row._count.solves, 'solve')} · {formatCompactUTC(row.createdAt)}
             </p>
           </li>
         ))}
       </ul>
 
-      <div className="hidden overflow-x-auto md:block">
-        <table className="w-full min-w-[40rem] border-collapse text-left">
-          <thead>
-            <tr className="border-b border-hairline type-label text-muted">
-              <th scope="col" className="py-2.5 pr-4 font-medium">
-                Team
-              </th>
-              <th scope="col" className="px-4 py-2.5 font-medium">
-                Owner
-              </th>
-              <th scope="col" className="px-4 py-2.5 text-right font-medium">
-                Members
-              </th>
-              <th scope="col" className="px-4 py-2.5 text-right font-medium">
-                Solves
-              </th>
-              <th scope="col" className="py-2.5 pl-4 text-right font-medium">
-                Created
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row) => (
-              <tr key={row.id} className="border-b border-hairline hover:bg-elevated">
-                <td className="py-3 pr-4">
-                  <Link
-                    to={`/teams/${row.id}`}
-                    className="font-medium text-primary transition-colors duration-instant hover:text-accent-strong"
-                  >
-                    {row.name}
-                  </Link>
-                </td>
-                <td className="px-4 py-3 type-small text-secondary">{row.owner.username}</td>
-                <td className="nums px-4 py-3 text-right text-secondary">
-                  {row._count.members}/{row.maxSize}
-                </td>
-                <td className="nums px-4 py-3 text-right text-secondary">{row._count.solves}</td>
-                <td className="nums py-3 pl-4 text-right type-small text-muted">
-                  {formatDateUTC(row.createdAt)}
-                </td>
+      <div className="hidden overflow-hidden rounded-lg border border-hairline bg-surface px-4 py-2 shadow-card md:block">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[40rem] border-collapse text-left">
+            <thead>
+              <tr className="border-b border-hairline type-label text-muted">
+                <th scope="col" className="py-2.5 pr-4 font-medium">
+                  Team
+                </th>
+                <th scope="col" className="px-4 py-2.5 font-medium">
+                  Owner
+                </th>
+                <th scope="col" className="px-4 py-2.5 text-right font-medium">
+                  Members
+                </th>
+                <th scope="col" className="px-4 py-2.5 text-right font-medium">
+                  Solves
+                </th>
+                <th scope="col" className="py-2.5 pl-4 text-right font-medium">
+                  Created
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {rows.map((row) => (
+                <tr key={row.id} className="border-b border-hairline last:border-b-0 hover:bg-elevated">
+                  <td className="py-3 pr-4">
+                    <Link
+                      to={`/teams/${row.id}`}
+                      className="font-medium text-primary transition-colors duration-instant hover:text-accent-strong"
+                    >
+                      {row.name}
+                    </Link>
+                  </td>
+                  <td className="px-4 py-3 type-small text-secondary">{row.owner.username}</td>
+                  <td className="nums px-4 py-3 text-right text-secondary">
+                    {row._count.members}/{row.maxSize}
+                  </td>
+                  <td className="nums px-4 py-3 text-right text-secondary">{row._count.solves}</td>
+                  <td className="nums py-3 pl-4 text-right type-small text-muted">
+                    {formatDateUTC(row.createdAt)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </>
   );
@@ -277,9 +286,9 @@ function attemptSummary(row: AdminSubmissionRow): string | null {
 function SubmissionsTable({ rows }: { rows: AdminSubmissionRow[] }) {
   return (
     <>
-      <ul className="border-t border-hairline md:hidden">
+      <ul className="divide-y divide-hairline overflow-hidden rounded-lg border border-hairline bg-surface px-3 shadow-card sm:px-4 md:hidden">
         {rows.map((row) => (
-          <li key={row.id} className="flex flex-col gap-1.5 border-b border-hairline py-3">
+          <li key={row.id} className="-mx-3 flex flex-col gap-1.5 rounded-md px-3 py-3 sm:-mx-4 sm:px-4">
             <div className="flex items-start justify-between gap-3">
               <p className="min-w-0 truncate text-primary">
                 {row.user}
@@ -303,51 +312,53 @@ function SubmissionsTable({ rows }: { rows: AdminSubmissionRow[] }) {
         ))}
       </ul>
 
-      <div className="hidden overflow-x-auto md:block">
-        <table className="w-full min-w-[46rem] border-collapse text-left">
-          <thead>
-            <tr className="border-b border-hairline type-label text-muted">
-              <th scope="col" className="py-2.5 pr-4 font-medium">
-                Time
-              </th>
-              <th scope="col" className="px-4 py-2.5 font-medium">
-                Player
-              </th>
-              <th scope="col" className="px-4 py-2.5 font-medium">
-                Team
-              </th>
-              <th scope="col" className="px-4 py-2.5 font-medium">
-                Challenge
-              </th>
-              <th scope="col" className="px-4 py-2.5 font-medium">
-                Verdict
-              </th>
-              <th scope="col" className="py-2.5 pl-4 font-medium">
-                Attempt
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row) => (
-              <tr key={row.id} className="border-b border-hairline hover:bg-elevated">
-                <td className="nums py-3 pr-4 type-small text-muted">
-                  {formatDateTimeUTC(row.createdAt)}
-                </td>
-                <td className="px-4 py-3 type-small text-secondary">{row.user}</td>
-                <td className="px-4 py-3 type-small text-secondary">{row.team ?? '—'}</td>
-                <td className="px-4 py-3 type-small text-primary">{row.challenge}</td>
-                <td className="px-4 py-3">
-                  <Badge tone={row.correct ? 'success' : 'danger'}>
-                    {row.correct ? 'Correct' : 'Wrong'}
-                  </Badge>
-                </td>
-                <td className="max-w-[16rem] truncate px-4 py-3 font-mono type-small text-secondary">
-                  {attemptSummary(row) ?? (row.correct ? '—' : '')}
-                </td>
+      <div className="hidden overflow-hidden rounded-lg border border-hairline bg-surface px-4 py-2 shadow-card md:block">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[46rem] border-collapse text-left">
+            <thead>
+              <tr className="border-b border-hairline type-label text-muted">
+                <th scope="col" className="py-2.5 pr-4 font-medium">
+                  Time
+                </th>
+                <th scope="col" className="px-4 py-2.5 font-medium">
+                  Player
+                </th>
+                <th scope="col" className="px-4 py-2.5 font-medium">
+                  Team
+                </th>
+                <th scope="col" className="px-4 py-2.5 font-medium">
+                  Challenge
+                </th>
+                <th scope="col" className="px-4 py-2.5 font-medium">
+                  Verdict
+                </th>
+                <th scope="col" className="py-2.5 pl-4 font-medium">
+                  Attempt
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {rows.map((row) => (
+                <tr key={row.id} className="border-b border-hairline last:border-b-0 hover:bg-elevated">
+                  <td className="nums py-3 pr-4 type-small text-muted">
+                    {formatDateTimeUTC(row.createdAt)}
+                  </td>
+                  <td className="px-4 py-3 type-small text-secondary">{row.user}</td>
+                  <td className="px-4 py-3 type-small text-secondary">{row.team ?? '—'}</td>
+                  <td className="px-4 py-3 type-small text-primary">{row.challenge}</td>
+                  <td className="px-4 py-3">
+                    <Badge tone={row.correct ? 'success' : 'danger'}>
+                      {row.correct ? 'Correct' : 'Wrong'}
+                    </Badge>
+                  </td>
+                  <td className="max-w-[16rem] truncate px-4 py-3 font-mono type-small text-secondary">
+                    {attemptSummary(row) ?? (row.correct ? '—' : '')}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </>
   );

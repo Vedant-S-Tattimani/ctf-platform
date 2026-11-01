@@ -6,11 +6,12 @@ import { ErrorState } from '@/components/ui/ErrorState';
 import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { Reveal } from '@/components/ui/Reveal';
 import { Select } from '@/components/ui/Select';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Textarea } from '@/components/ui/Textarea';
 import { errorMessage } from '@/lib/errors';
-import { formatDateTimeUTC } from '@/lib/format';
+import { formatCount, formatDateTimeUTC } from '@/lib/format';
 import { toast } from '@/store/toast';
 import { useAdminEvents, useEventMutations } from './queries';
 
@@ -170,7 +171,7 @@ export function AdminEvents() {
           onRetry={() => void refetch()}
         />
       ) : events.length === 0 ? (
-        <div className="border-y border-hairline py-12 text-center">
+        <div className="rounded-lg border border-hairline bg-surface p-6 text-center shadow-card sm:p-8">
           <p className="type-h3 text-primary">No events yet</p>
           <p className="mx-auto mt-2 max-w-measure text-secondary">
             Create one to give challenges a competition window.
@@ -180,11 +181,11 @@ export function AdminEvents() {
           </Button>
         </div>
       ) : (
-        <ul className="border-t border-hairline">
+        <Reveal stagger role="list" as="ul" className="flex flex-col gap-4">
           {events.map((eventItem) => (
             <li
               key={eventItem.id}
-              className="grid gap-4 border-b border-hairline py-5 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
+              className="grid gap-4 rounded-lg border border-hairline bg-surface p-6 shadow-card sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:p-8"
             >
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
@@ -192,22 +193,24 @@ export function AdminEvents() {
                   <Badge tone={eventItem.published ? 'success' : 'neutral'}>
                     {eventItem.published ? 'Published' : 'Draft'}
                   </Badge>
-                  <Badge tone="accent">{eventItem._count.challenges} challenges</Badge>
+                  <Badge tone="accent">
+                    {formatCount(eventItem._count.challenges, 'challenge')}
+                  </Badge>
                   <Badge tone={eventItem.scoringMode === 'DYNAMIC' ? 'info' : 'neutral'}>
                     {eventItem.scoringMode === 'DYNAMIC' ? 'Dynamic scoring' : 'Static scoring'}
                   </Badge>
                 </div>
                 <p className="mt-1 font-mono type-small text-muted">/{eventItem.slug}</p>
-                <dl className="mt-3 grid gap-x-6 gap-y-2 type-small sm:grid-cols-2 lg:grid-cols-4">
+                <dl className="mt-3 grid gap-x-6 gap-y-3 type-small sm:grid-cols-2">
                   <div>
                     <dt className="type-label text-muted">Starts</dt>
-                    <dd className="nums text-secondary">
+                    <dd className="nums whitespace-nowrap text-secondary">
                       {eventItem.startsAt ? formatDateTimeUTC(eventItem.startsAt) : 'Not set'}
                     </dd>
                   </div>
                   <div>
                     <dt className="type-label text-muted">Ends</dt>
-                    <dd className="nums text-secondary">
+                    <dd className="nums whitespace-nowrap text-secondary">
                       {eventItem.endsAt ? formatDateTimeUTC(eventItem.endsAt) : 'Not set'}
                     </dd>
                   </div>
@@ -235,7 +238,7 @@ export function AdminEvents() {
               </div>
             </li>
           ))}
-        </ul>
+        </Reveal>
       )}
 
       <Modal

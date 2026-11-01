@@ -29,7 +29,7 @@ export function Footer() {
 
         <nav
           aria-label="Footer"
-          className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-4 sm:gap-x-12"
+          className="grid grid-cols-2 gap-x-8 gap-y-10 sm:grid-cols-4 sm:gap-x-12 md:grid-cols-2 lg:grid-cols-4"
         >
           <div className="flex flex-col gap-3">
             <p className={columnHeading}>Play</p>

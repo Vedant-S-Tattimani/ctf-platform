@@ -15,6 +15,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
   const generatedId = useId();
   const inputId = id ?? generatedId;
   const describedBy = error ? `${inputId}-error` : hint ? `${inputId}-hint` : undefined;
+  const isFile = props.type === 'file';
 
   return (
     <div className="flex flex-col gap-2">
@@ -33,6 +34,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
             'focus-visible:border-accent focus-visible:shadow-card disabled:cursor-not-allowed disabled:opacity-60',
             error ? 'border-danger' : 'border-subtle hover:border-strong',
             trailing && 'pr-12',
+            isFile &&
+              'cursor-pointer px-3 file:mr-3 file:h-7 file:rounded-pill file:border file:border-subtle file:bg-elevated file:px-3 file:text-xs file:font-medium file:text-primary hover:file:border-strong',
             className,
           )}
           {...props}

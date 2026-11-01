@@ -6,6 +6,7 @@ import { ErrorState } from '@/components/ui/ErrorState';
 import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { Reveal } from '@/components/ui/Reveal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { errorMessage } from '@/lib/errors';
 import { toast } from '@/store/toast';
@@ -106,7 +107,7 @@ export function AdminCategories() {
           onRetry={() => void refetch()}
         />
       ) : categories.length === 0 ? (
-        <div className="border-y border-hairline py-12 text-center">
+        <div className="rounded-lg border border-hairline bg-surface p-6 text-center shadow-card sm:p-8">
           <p className="type-h3 text-primary">No categories yet</p>
           <p className="mx-auto mt-2 max-w-measure text-secondary">
             Create the first category so challenges can be grouped.
@@ -116,10 +117,10 @@ export function AdminCategories() {
           </Button>
         </div>
       ) : (
-        <>
-          <ul className="border-t border-hairline md:hidden">
+        <Reveal>
+          <ul className="divide-y divide-hairline overflow-hidden rounded-lg border border-hairline bg-surface px-3 shadow-card sm:px-4 md:hidden">
             {categories.map((category) => (
-              <li key={category.id} className="flex flex-col gap-3 border-b border-hairline py-3">
+              <li key={category.id} className="-mx-3 flex flex-col gap-3 rounded-md px-3 py-3 sm:-mx-4 sm:px-4">
                 <div className="flex items-start justify-between gap-3">
                   <span className="flex min-w-0 items-center gap-2">
                     <span
@@ -171,82 +172,84 @@ export function AdminCategories() {
             ))}
           </ul>
 
-          <div className="hidden overflow-x-auto md:block">
-            <table className="w-full min-w-[34rem] border-collapse text-left">
-              <thead>
-                <tr className="border-b border-hairline type-label text-muted">
-                  <th scope="col" className="py-2.5 pr-4 font-medium">
-                    Name
-                  </th>
-                  <th scope="col" className="px-4 py-2.5 font-medium">
-                    Slug
-                  </th>
-                  <th scope="col" className="px-4 py-2.5 text-right font-medium">
-                    Challenges
-                  </th>
-                  <th scope="col" className="py-2.5 pl-4 text-right">
-                    <span className="sr-only">Actions</span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {categories.map((category) => (
-                  <tr key={category.id} className="border-b border-hairline hover:bg-elevated">
-                    <td className="py-3 pr-4">
-                      <span className="flex items-center gap-2 font-medium text-primary">
-                        <span
-                          aria-hidden
-                          className="size-2.5 rounded-pill"
-                          style={{ backgroundColor: category.color ?? 'var(--accent)' }}
-                        />
-                        {category.name}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 font-mono type-small text-secondary">
-                      {category.slug}
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <Badge tone="neutral">{category._count.challenges}</Badge>
-                    </td>
-                    <td className="py-3 pl-4">
-                      <div className="flex items-center justify-end gap-1">
-                        {confirmId === category.id ? (
-                          <>
-                            <Button
-                              variant="danger"
-                              size="sm"
-                              loading={remove.isPending}
-                              onClick={() => void handleDelete(category.id)}
-                            >
-                              Confirm
-                            </Button>
-                            <Button variant="ghost" size="sm" onClick={() => setConfirmId(null)}>
-                              Cancel
-                            </Button>
-                          </>
-                        ) : (
-                          <>
-                            <Button variant="ghost" size="sm" onClick={() => openEdit(category)}>
-                              Edit
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="text-danger hover:bg-danger-faint"
-                              onClick={() => setConfirmId(category.id)}
-                            >
-                              Delete
-                            </Button>
-                          </>
-                        )}
-                      </div>
-                    </td>
+          <div className="hidden overflow-hidden rounded-lg border border-hairline bg-surface px-4 py-2 shadow-card md:block">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[34rem] border-collapse text-left">
+                <thead>
+                  <tr className="border-b border-hairline type-label text-muted">
+                    <th scope="col" className="py-2.5 pr-4 font-medium">
+                      Name
+                    </th>
+                    <th scope="col" className="px-4 py-2.5 font-medium">
+                      Slug
+                    </th>
+                    <th scope="col" className="px-4 py-2.5 text-right font-medium">
+                      Challenges
+                    </th>
+                    <th scope="col" className="py-2.5 pl-4 text-right">
+                      <span className="sr-only">Actions</span>
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {categories.map((category) => (
+                    <tr key={category.id} className="border-b border-hairline last:border-b-0 hover:bg-elevated">
+                      <td className="py-3 pr-4">
+                        <span className="flex items-center gap-2 font-medium text-primary">
+                          <span
+                            aria-hidden
+                            className="size-2.5 rounded-pill"
+                            style={{ backgroundColor: category.color ?? 'var(--accent)' }}
+                          />
+                          {category.name}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 font-mono type-small text-secondary">
+                        {category.slug}
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <Badge tone="neutral">{category._count.challenges}</Badge>
+                      </td>
+                      <td className="py-3 pl-4">
+                        <div className="flex items-center justify-end gap-1">
+                          {confirmId === category.id ? (
+                            <>
+                              <Button
+                                variant="danger"
+                                size="sm"
+                                loading={remove.isPending}
+                                onClick={() => void handleDelete(category.id)}
+                              >
+                                Confirm
+                              </Button>
+                              <Button variant="ghost" size="sm" onClick={() => setConfirmId(null)}>
+                                Cancel
+                              </Button>
+                            </>
+                          ) : (
+                            <>
+                              <Button variant="ghost" size="sm" onClick={() => openEdit(category)}>
+                                Edit
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-danger hover:bg-danger-faint"
+                                onClick={() => setConfirmId(category.id)}
+                              >
+                                Delete
+                              </Button>
+                            </>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </>
+        </Reveal>
       )}
 
       <p className="type-small text-muted">

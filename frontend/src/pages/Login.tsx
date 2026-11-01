@@ -3,6 +3,7 @@ import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { AuthLayout } from '@/components/auth/AuthLayout';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { PasswordInput } from '@/components/ui/PasswordInput';
 import { useAuth } from '@/hooks/useAuth';
 import { errorMessage, fieldErrorsFromApi } from '@/lib/errors';
 import { toast } from '@/store/toast';
@@ -73,9 +74,8 @@ export default function Login() {
           onChange={(e) => setEmail(e.target.value)}
           error={fieldErrors.email}
         />
-        <Input
+        <PasswordInput
           label="Password"
-          type="password"
           name="password"
           autoComplete="current-password"
           required
